@@ -1,0 +1,561 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load humanize %}
+{% if show_dashboard %}
+        {% include "dashboard.html" %}
+{% endif %}
+{% block additional-headers %}
+    <link href="{{STATIC_URL}}css/datepicker.css" rel="stylesheet">
+    <style >
+    .data-table-container table {
+        clear: both;
+        display: table !important;
+        overflow-x: auto;
+        width: 98% !important;
+        padding-left: 20px; 
+    }
+
+    .highlight { background-color: #D9EDF7; }
+
+    .table th, .table td {
+        border: 1px solid #dddddd !important;
+        text-align:center !important;
+    }
+    
+    .table thead {
+        font-size:14pt;
+    }    
+    
+
+    .table th {
+        background-color: #A9BFC8 !important;
+    }
+
+    .highlight { background-color: #D9EDF7; }
+
+    #report_table {
+        width: 100% !important;
+        overflow: auto;
+        padding-left: 10px; 
+    }
+
+    #xform-list {
+        padding-left: 2%;    
+    }
+
+    #date-message-container {
+        padding-left: 2%;    
+    }
+
+    #message-container, #error-container{
+      display : none ;
+    }
+
+    .btn {
+      margin-top: -4px ;
+    }
+
+    .back-to-top {
+      background: none;
+      margin: 0;
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      width: 70px;
+      height: 70px;
+      z-index: 100;
+      display: none;
+      text-decoration: none;
+      color: #6AD092;
+      /*background-color: #ff9000;*/
+    }
+    .back-to-top i {
+      font-size: 60px;
+    }
+    </style>
+
+{% endblock %}
+{% block content %}
+    <section id="data-view">
+        <div class="page-header">
+            <h1>{% trans "Report" %}</h1>
+        </div>
+        <div class="row">
+        <!-- -->
+          <div id="date-message-container">
+            <div id="error-container" class="alert alert-danger" role="alert">
+                Please Select a Project
+            </div>
+            <div id="message-container" class="alert alert-success" role="alert">
+                No Data Found
+            </div>
+            <div id="form-table">
+                <form id="filter" method="post" action="/reports/export/" enctype="application/x-www-form-urlencoded">
+                {% csrf_token %}
+                    <span style='float:middle;'>
+                            <div class="input-append date">
+                                <label>Project</label>
+                                <select id="xform_select" name="xform_select">
+                                    <option selected="selected" value="custom">Select a Project</option>
+                                    {% for xform in xforms_list %}
+                                    <option value="{{xform.id_string}}">{{ xform.title }}</option>
+                                    {% endfor %}             
+                                </select>
+                            </div>
+                            
+
+                            <div class="question-container input-append date">
+                                
+                            </div>
+
+                            <br/>
+                            
+                            <div id="datetimepicker1" class="input-append date">
+                                <label>Current From</label>
+                                <input type="text" class="datepicker" name="current_start_date" id="current_start_date"/>
+                            </div>
+
+                            
+                            <div id="datetimepicker2" class="input-append date">
+                                <label>Current To</label>
+                                <input type="text" class="datepicker" name="current_end_date" id="current_end_date"/>
+                            </div>
+                            <br/>
+                            
+                            <div id="datetimepicker3" class="input-append date">
+                                <label>Previous From</label>
+                                <input type="text" class="datepicker" name="previous_start_date" id="previous_start_date"/>
+                            </div>
+                           
+                            <div id="datetimepicker4" class="input-append date">
+                                <label>Previous To:</label>
+                                <input type="text" class="datepicker" name="previous_end_date" id="previous_end_date"/>
+                            </div>
+                            <br/>
+                            <div class="villege-container">
+                  
+                            </div>
+                            <br>
+                        <input id="btn_report" type="submit" onclick="filterDownload(event,1);" class="btn btn-primary" value="{% trans 'Report' %}" />
+                        <input id="btn_export" type="submit" onclick="filterDownload(event,2);" class="btn btn-primary" value="{% trans 'Export' %}" />        
+                    </span>
+                </form>
+              </div>
+            <br>
+                <div id="tableset-container" class="data-table-container table table-striped table-hover">
+                    
+                </div> <!-- div tableset-container-->
+                
+                 <!-- Modal Start-->
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Select Villege(s)</h4>
+                      </div>
+                      <div class="modal-body">
+                        
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default cancel" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary save">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div><!-- Modal End-->
+
+                <a href="#" class="back-to-top" style="display: inline;"> 
+                  <i class="fa fa-arrow-circle-up"></i>
+                </a>
+            </div><!-- div form-table-->
+        </div> <!-- div row-->
+    </section>
+{% endblock %}
+{% block below-content %}
+
+
+{% endblock %}
+{% block javascript %}
+    {{ block.super }}
+    <script type="text/javascript" src="{{STATIC_URL}}js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.searchable-ie-1.1.0.min.js"></script>
+    <script type="text/javascript">
+    var villege_array = new Array();
+
+    $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              var csrftoken = getCookie('csrftoken');
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+    });
+    function getCookie(name) {
+      var cookieValue = null;
+      if (document.cookie && document.cookie != '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+              var cookie = jQuery.trim(cookies[i]);
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+    }
+
+    function csrfSafeMethod(method) {
+      // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+  
+    $(function () {
+        // document.getElementById("form-table").style.display = "none";
+        $('.datepicker').datepicker({
+            format: 'yyyy-mm-dd'
+        });
+    });
+
+    $( document ).ready(function() {
+        // $('[data-toggle="tooltip"]').tooltip();
+        $('[data-toggle="popover"]').popover();
+        today = getDesiredDate(0);
+        threemonthsFromNow = getDesiredDate(3);
+        var offset = 250;
+        var duration = 300;
+        jQuery(window).scroll(function() {
+        if (jQuery(this).scrollTop() > offset) {
+          jQuery('.back-to-top').fadeIn(duration);
+        } else {
+          jQuery('.back-to-top').fadeOut(duration);
+        }
+        });
+        
+        jQuery('.back-to-top').click(function(event) {
+        event.preventDefault();
+        jQuery('html, body').animate({scrollTop: 0}, duration);
+        return false;
+        });
+        
+        $('#current_start_date').val(today)
+        $('#current_end_date').val(threemonthsFromNow);
+        $('#previous_start_date').val(today)
+        $('#previous_end_date').val(threemonthsFromNow);
+        document.getElementById("error-container").style.display = "none";
+        document.getElementById("message-container").style.display = "none";
+    });
+
+    function getDesiredDate(months) {
+        var date = new Date();
+        months = parseInt(months);
+
+        if(months > 0){
+            date.setMonth(date.getMonth() + months);
+        }
+
+        var dd = date.getDate();
+        var mm = date.getMonth()+1; //January is 0!
+        var yyyy = date.getFullYear();
+        if(dd<10) {
+            dd='0'+dd
+        }
+        if(mm<10) {
+            mm='0'+mm
+        }
+        formatted_date = yyyy+'-'+mm+'-'+dd;
+        // console.log(formatted_date);
+        return formatted_date;
+    }
+
+    function filterDownload(e,formnumber)
+    {
+      e.preventDefault();
+      var datetimepicker1 = $('#current_start_date').val();
+      if(datetimepicker1 == null || datetimepicker1=='undefined' || !datetimepicker1 )
+      {
+          datetimepicker1 = "";
+      }else{
+        datetimepicker1 = datetimepicker1 + "T00:00:00" ;
+      }
+      var datetimepicker2 = $('#current_end_date').val();
+      if(datetimepicker2 == null || datetimepicker2=='undefined' || !datetimepicker2 )
+      {
+          datetimepicker2 = "";
+      }else{
+        datetimepicker2 = datetimepicker2 + "T23:59:59" ;  
+      }
+      var datetimepicker3 = $('#previous_start_date').val();
+      if(datetimepicker3 == null || datetimepicker3=='undefined' || !datetimepicker3 )
+      {
+          datetimepicker3 = "";
+      }else{
+        datetimepicker3 = datetimepicker3 + "T00:00:00" ;  
+      }
+      var datetimepicker4 = $('#previous_end_date').val();
+      if(datetimepicker4 == null || datetimepicker4=='undefined' || !datetimepicker4 )
+      {
+          datetimepicker4 = "";
+      }else{
+        datetimepicker4 = datetimepicker4 + "T23:59:59" ;  
+      }
+
+      var current_from_date = datetimepicker1;
+      var current_to_date = datetimepicker2;
+      var previous_from_date = datetimepicker3;
+      var previous_to_date = datetimepicker4;
+      // document.getElementById("filter").submit();
+      document.getElementById("message-container").style.display = "none";
+      // var attribute = $(this).attr("data-id");
+      var attribute = $('#xform_select').val();
+      var question_select = $('#question_select').val();
+      if(attribute == 'custom') {
+        document.getElementById("error-container").style.display = "block";
+      } else {
+            document.getElementById("error-container").style.display = "none";
+            document.getElementById("form-table").style.display = "block";
+            var div = $("#alert-message");  
+            ajax_data = {}
+            ajax_data['id'] = attribute;
+            ajax_data['current_from_date'] = current_from_date;
+            ajax_data['current_to_date'] = current_to_date;
+            ajax_data['previous_from_date'] = previous_from_date;
+            ajax_data['previous_to_date'] = previous_to_date;
+            ajax_data['question_select'] = question_select;
+            if( villege_array.length > 0 ){
+              ajax_data['villege_array'] = villege_array;
+            }
+            if(formnumber === 1) {
+              $("#tableset-container").empty();
+              $("#tableset-container").append('<div id="animate" style="text-align:center"><img src="/static/images/ring.svg"></div>');
+              ajax_data['type'] = 'view' ;
+                $.ajax({
+                  type: "GET",
+                  url:"/reports/all/",
+                  data: ajax_data,
+                  success: function(data){
+                      var tableset_container_contents = '<div id="report_table">'
+                      var iter = 0 ;
+                      if(data.length > 0){
+                          data.forEach(function(option) {
+                              tableset_container_contents += '<table border="1">' ;
+                              tableset_container_contents += '<tr><thead><th colspan="5">Data Display Format  (aggregate)</td>' ;
+                              if (option.villege_list.length > 0){
+                                  tableset_container_contents += '<th colspan="'+option.disaggregate_colspan+'">Data Display Format (disaggregate)</thead></td>';
+                              }else{
+                                tableset_container_contents += '</thead>';
+                              }    
+
+                              tableset_container_contents += '</tr><tr>' ;
+                              tableset_container_contents += '<th>'+option.question+'</th>' ;
+                              tableset_container_contents += '<th>Current</th>' ;
+                              tableset_container_contents += '<th>Previous</th>' ;
+                              tableset_container_contents += '<th>Percentage Change</th>' ;
+                              tableset_container_contents += '<th data-toggle="tooltip" title="Human Readable Calculation" >Total</th>' ;
+
+                              if (option.villege_list.length > 0){
+                                  tableset_container_contents += '<th>'+option.question+'</th>' ;
+                              }
+                              option.villege_list.forEach(function(villege) {
+                                  tableset_container_contents += '<th colspan="2">'+villege.title+'</th>';
+                                  tableset_container_contents += '<th>Percentage Change</th>' ;
+                              });
+                              tableset_container_contents += '</tr><tr>' ;
+                              if (option.villege_list.length > 0){
+                                  tableset_container_contents += '<td colspan="5"></td>' ;
+                                  tableset_container_contents += '<td></td>' ;
+                              }
+                              
+                              option.villege_list.forEach(function(villege) {
+                                  tableset_container_contents += '<td>Current</td>' ;
+                                  tableset_container_contents += '<td>Previous</td>' ;
+                                  tableset_container_contents += '<td></td>' ;
+                              });
+
+                              tableset_container_contents += '</tr>' ;
+                              option.list.forEach(function(table_content) {
+                                  var i = 0 ;
+                                  tableset_container_contents += '<tr>' ;
+                                  table_content.forEach(function(td_content) {
+                                      if (i === 1 || i === 2 || i === 4 || ( i > 4 && (i % 3 === 0 || i % 3 === 1 ) ) ){
+                                        tableset_container_contents += '<td><a href="javascript:void(0);" title="Percentage" data-toggle="popover" data-trigger="hover" data-content="'+ get_percentage(table_content[i],option.footer[i]) +'">'+td_content+'</td>' ;
+                                      }else{
+                                        tableset_container_contents += '<td>'+td_content+'</td>';
+                                      }
+                                  i++ ;
+                                  });
+                                  tableset_container_contents += '</tr>' ;
+                              });
+                              tableset_container_contents += '</tr>' ;
+                              
+                              option.footer.forEach(function(footer_content) {
+                                  tableset_container_contents += '<td><b>' + footer_content + '</b></td>';
+                              });
+                              tableset_container_contents += '</tr></table>' ;
+                              iter++ ;
+                          });
+                          tableset_container_contents += '</div></div>' ;
+                      }else{
+                        document.getElementById("message-container").style.display = "block";
+                      }
+                      $('#animate').remove();
+                      $("#tableset-container").append(tableset_container_contents);
+                      $('[data-toggle="popover"]').popover({placement:'bottom'});
+                  },
+                  error: function(){
+                      $('#animate').remove();
+                      $('#message-container').empty();
+                      $('#message-container').append('Error Occured, Try Again');
+                      document.getElementById("message-container").style.display = "block";
+                  }
+              }); // end-ajax
+            }else if(formnumber === 2) {
+              ajax_data.type = 'export' ;
+              for (var key in ajax_data) {
+                if (ajax_data.hasOwnProperty(key)) {
+                  $('#filter').append('<input type="hidden" name="'+key+'" value="'+ajax_data[key]+'">');
+                }
+              }
+              $('#animate').remove();
+              $('#filter').submit();
+            }
+            
+            
+      }
+    } // end filter function
+
+    //populating villege list based on project/form check
+    $('#xform_select').change(function(){
+      villege_array.length = 0
+      $('.villege-container').empty();
+      $('.question-container').empty();
+
+      var selected_project = $(this).val();
+      var table = '<table id="access-table" class="table" border="1">';
+      var table_end = '</table>';
+      var icon = 'Choose Villege: <a href="#" class="ajax_flag" data-toggle="modal" data-target="#myModal"><i class="fa fa-cog"></i></a><br>'
+      if(selected_project !== 'custom'){
+        $.ajax({
+            type: "GET",
+            url:"/reports/villege-list/",
+            data: {project_id: selected_project},
+            success: function(data){
+                var table_header_flag = true ;
+                var count = 0;
+                if (data.length > 0){
+                    $("#myModal").attr("aria-hidden", "true");
+                    $("#myModal").attr("style", "display: none;");
+                    
+                    data.forEach(function(option) {
+                        var row = '<tr id="row'+count+'" class="clickable-row highlight">' ;
+                                if(table_header_flag){
+                                    row = row + '<th data-id="'+option['villege_value']+'">'+option['villege_title']+'</th>' ;
+                                }else{
+                                    row = row + '<td data-id="'+option['villege_value']+'">'+option['villege_title']+'</td>' ;
+                                    villege_array.push(option['villege_value'])
+                                }
+                        table_header_flag = false ;
+                        option = null;
+                        row = row + '</tr>';
+                        table += row ;
+                        count += 1;
+                    });
+                    table += table_end ;
+                    $(".modal-body").empty();
+                    $(".modal-body").append('<input type="text" id="search" placeholder="Search...">');
+                    $(".modal-body").append(table);
+                    $( '#access-table' ).searchable({clearOnLoad: true});
+                    $( '#animate' ).remove();
+                    $('.villege-container').append(icon);
+                }
+            },
+            error: function(){
+                $('#message-container').empty();
+                $('#message-container').append('Error Occured, Try Again');
+                document.getElementById("message-container").style.display = "block";
+            }
+        }); // end-ajax
+
+        // populates a dropdown with list of all questions.
+        var select_dropdown = '<label>Question</label>' ;
+        select_dropdown += '<select id="question_select" name="question_select">' ;
+        select_dropdown += '<option selected="selected" value="custom">Select a Question</option>';
+        $.ajax({
+            type: "GET",
+            url:"/reports/question-list/",
+            data: {project_id: selected_project},
+            success: function(data){
+                var table_header_flag = true ;
+                var count = 0;
+                if (data.length > 0){
+                  data.forEach(function(option) {
+                  select_dropdown += '<option value="'+option['ques_key']+'">'+ option['ques_label'] +'</option>';
+                  });
+                select_dropdown += '</select>';
+                $('.question-container').append(select_dropdown);
+                }
+            },
+            error: function(){
+                $('#message-container').empty();
+                $('#message-container').append('Error Occured, Try Again');
+                document.getElementById("message-container").style.display = "block";
+            }
+        }); // end-ajax
+      }
+    });
+
+    function get_percentage(numerator, denominator) {
+      numerator = parseInt(numerator, 10);
+      denominator = parseInt(denominator, 10);
+      if (denominator === 0) {
+        return 'N/A'
+      }
+      var result = ( numerator / (denominator * 1.0)) * 100 ;
+      result = Math.round(result * 100) / 100
+      return result + "%"
+    }
+
+    var previous_villege_array = new Array();
+    $(document).on("click", ".ajax_flag", function(e) {
+      previous_villege_array = villege_array.slice();
+      $('.clickable-row').find('td').each (function() {
+        villege_id = $(this).attr('data-id');
+        if($.inArray(villege_id, previous_villege_array) === -1){
+          $("td[data-id~='"+villege_id+"']").parent().removeClass("highlight");
+        }else{
+          $("td[data-id~='"+villege_id+"']").parent().addClass("highlight");
+        }
+      });
+    });
+
+    $(document).on("click", ".cancel, .close", function(e) {
+      villege_array = previous_villege_array
+    });
+
+    $(document).on("click", ".save", function(e) {
+      $('#myModal').modal('hide');
+    });
+
+    // adjusting villege array push/pop and its design.
+    $(document).on("click", ".clickable-row", function(e) {
+      $(this).find('td').each (function() {
+        villege_id = $(this).attr('data-id');
+        var selected = $("td[data-id~='"+villege_id+"']").parent().hasClass("highlight");
+        $(".clickable-row").not("td[data-id~='"+villege_id+"']").parent().removeClass("highlight");
+        if(!selected){
+          $("td[data-id~='"+villege_id+"']").parent().addClass("highlight");
+        }else{
+          $("td[data-id~='"+villege_id+"']").parent().removeClass("highlight");
+        }
+        if($.inArray(villege_id, villege_array) === -1){
+          villege_array.push(villege_id);
+        }else{
+          villege_array.splice( $.inArray(villege_id, villege_array),1);
+        }
+      });
+    });
+</script>
+
+{% endblock %}

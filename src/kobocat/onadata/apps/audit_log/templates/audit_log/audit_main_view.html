@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block additional-headers %}
+<link rel="stylesheet" href="{{STATIC_URL}}css/style.css">
+{% endblock %}  
+{% block additional-javascript %}
+
+<script type="text/javascript" src="{{STATIC_URL}}js/audit_log_main.js"></script>
+<script type="text/javascript">
+request_user = "{{request_user}}";
+{% if log_detail %}                
+        createTableRow('{{ log_detail|safe }}');
+{% endif %}
+console.log(request_user);
+</script>
+{% endblock %}
+
+{% block content %}
+<table id="tg-xY4Sf" class="tg" name="summary_table" style="width:100%">
+  <tr>
+  	<th class="tg-yw4l">Serial</th>
+    <th class="tg-yw4l">Project ID</th>
+    <th class="tg-yw4l">Submitted By</th>
+    <th class="tg-yw4l">Change Time</th>  
+    <th class="tg-yw4l">View Difference</th>    
+  </tr>
+{% endblock %}

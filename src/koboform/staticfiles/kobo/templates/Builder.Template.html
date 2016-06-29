@@ -1,0 +1,21 @@
+<div class="container__fixed">
+    <div class="container__wide">
+        <section koboform-question-library class="koboform__questionlibrary ng-hide" ng-show="displayQlib" click-handler="add_item(item)" current-item="currentItem"></section>
+    </div>
+</div>
+<section class="form-builder">
+    <div class="form-builder__message form-builder__message--error container" ng-if="!!errorMessage"> 
+        <strong>There was a problem loading your form:</strong><br>
+        {{errorMessage}}
+        <br>
+        <br>
+        If you need help recovering the form, please contact
+        <a href="http://support.kobotoolbox.org/customer/portal/emails/new" target="_blank">KoBoToolbox support</a>.
+    </div>
+    <div ng-show="survey_loading" class="survey-loading">
+      <div class="container">
+        <i class="fa fa-spinner fa-spin fa-2x fa-align-center"></i>
+        <div>Loading Form</div>
+      </div>
+    </div>
+</section>

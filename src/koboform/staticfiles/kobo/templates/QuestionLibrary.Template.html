@@ -1,0 +1,78 @@
+<div class="library__wrapper">
+<div class="container__wide library">
+  <div class="tags clearfix">
+
+    <div class="tags__header">
+      <h2 class="tags__title">
+        Tags <span class="tags__tag-count">{{ api.tags.items.length }} tag{{ api.tags.items.length !== 1 && 's' || '' }}</span></h2>
+
+      <item-filters
+        api="tags"
+        sorter="tagSorter"
+        filters="tagFilters"
+        toggle="nowhere"
+      ></item-filters>
+
+
+      <add-new-tag></add-new-tag>
+
+    </div>
+
+      <item-list
+        ng-show="api.tags.items && api.tags.items.length > 0"
+        rest-api="tags"
+        filters="tagFilters"
+        sort-criteria="tagSorter.selected.value"
+        base-class="tags__tag"
+        quick-edit="true"
+        additional-select-operations="toggleTagInFilters"
+        can-delete="true"
+      >
+        <span class="tag__question-count">{{ item.count }} question{{ item.count !== 1 && 's' || '' }}</span>
+      </item-list>
+
+    <div class="tags__empty" ng-show="api.tags.items && api.tags.items.length === 0">
+      You don't have any tags yet.
+    </div>
+
+
+  </div>
+
+  <div class="questions clearfix">
+    <div class="questions__header">
+      <h2 class="questions__title">Questions <span class="questions__question-count">{{getQuestionCount()}} question{{ getQuestionCount() !== 1 && 's' || '' }}</span></h2>
+      <div class="question__create">
+        <form action="/import_questions" class="question__import-library btn--fileupload js-import-fileupload js-import-questions">
+          <span class="fileinput-button">
+            <span ng-show="isLoading"><i class="fa fa-spin fa-spinner"></i> Importing Questions</span><span ng-show="!isLoading">Import Library from XLS</span>
+            <input type="file" name="files">
+          </span>
+        </form>
+        <a class="question__create-new" href="#/library/questions/new">+ Add New Question</a>
+      </div>
+
+      <item-filters
+        api="questions"
+        sorter="questionSorter"
+        filters="questionFilters"
+        toggle="toggleSelectAll"
+        can-select-all="true"
+      ></item-filters>
+
+    </div>
+
+  <item-list
+    rest-api="questions"
+    filters="questionFilters"
+    sort-criteria="questionSorter.selected.value"
+    base-class="questions__question"
+    full-edit="true"
+    full-edit-class="question__edit"
+    additional-select-operations="toggleSelectAll"
+  >
+    <question-details></question-details>
+  </item-list>
+
+  </div>
+</div>
+</div>

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load i18n %}
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    {% comment %}{% load compress %}{% endcomment %}
+    {% load staticfiles %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>mPower Form Builder </title>
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{csrf_token}}">
+
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}" />
+    <!-- iPhone + iPad icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{% static 'img/apple-touch-icon-114x114.png' %}">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{% static 'img/apple-touch-icon-72x72-precomposed.png' %}">
+    <link rel="apple-touch-icon-precomposed" href="{% static 'img/apple-touch-icon-precomposed.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+
+    {% comment %}{% compress css %}{% endcomment %}
+    <link rel="stylesheet" href="{% static 'css/jquery-ui-1.10.4.custom.css' %}">
+    <link rel="stylesheet" href="{% static 'components/fontawesome/css/font-awesome.css' %}" media="all">
+    <link rel="stylesheet" href="{% static 'kobo.compiled/kobo1.css' %}" media="all">
+    {% comment %}{% endcompress %}{% endcomment %}
+
+    <script src="{% static 'kobo.compiled/modernizr.js' %}"></script>
+
+    {% if DEBUG %}
+    <script src="{% static 'components/jquery/dist/jquery.js' %}"></script>
+    {% else %}
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    {% endif %}
+
+    
+{% block content %}
+    <section id="data-view">
+            <h1>Register with User Module</h1>
+            {% if registered %}
+            <div class="alert alert-success" role="alert">
+                thank you for registering!
+            </div>
+        
+            <form action="/usermodule/">
+                <input type="submit" class="btn btn-success" value="Return to Administration">
+            </form>
+            {% else %}
+                    User Module says: <strong>register here!</strong><br />
+
+        <span class="span12">
+            <div class="data-table-container table table-striped table-hover">
+                    <form id="user_form" method="post" action="/usermodule/register/"
+                            enctype="multipart/form-data">
+
+                        {% csrf_token %}
+
+                        <!-- Display each form. The as_p method wraps each element in a paragraph
+                             (<p>) element. This ensures each element appears on a new line,
+                             making everything look neater. -->
+                        <!--id of label:: {{ user_form.username.id_for_label }}-->
+                        <!--Complete label:: {{user_form.username.label_tag}}-->
+                        <!--error for field:: {{ user_form.username.errors }}-->
+                        <!--field itself:: {{ user_form.username}}-->
+
+                        {{ user_form.as_p }}
+                        {{ profile_form.as_p }}
+
+                        <!-- Provide a button to click to submit the form. -->
+                        <input type="submit" class="btn btn-primary btn-lg" name="submit" value="Register" />
+                    </form>
+                {% endif %}
+                <div style="clear: both;"></div>
+            </div>
+        </span>
+
+    </section>
+{% endblock %}
+
+
+</html>
+

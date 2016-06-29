@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% if show_dashboard %}
+        {% include "dashboard.html" %}
+{% endif %}
+{% block additional-headers %}
+    <link href="/static/bower_components/backgrid/lib/backgrid.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/bower_components/backgrid-filter/backgrid-filter.min.css" />
+    <link rel="stylesheet" href="/static/bower_components/backgrid-paginator/backgrid-paginator.min.css" />
+    <link href="/static/css/data_view.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}css/datepicker.css" rel="stylesheet">
+
+<style >
+        .data-table-container table {
+            clear: both;
+            display: table !important;
+            overflow-x: auto;
+            width: 98% !important;
+        }
+
+        .table th, .table td {
+            border: 1px solid #dddddd !important;
+        }
+</style>
+{% endblock %}
+{% block content %}
+    <section id="data-view">
+        <div class="page-header">
+            <h1>{% trans "Data View" %}</h1>
+        </div>
+        <div class="row">
+        {% if user.is_authenticated %}
+        <form id="filter" action="{% url "onadata.apps.main.views.data_list" user.username %}" method="post" enctype="application/x-www-form-urlencoded">
+        {% csrf_token %}
+            <span style='float:middle;'>
+              <div>
+                Date From:
+				  <div id="datetimepicker1" class="input-append date">
+				    <input type="text" class="datepicker" name="start_date" id="start_date"/>
+                  </div>
+
+				Date To:
+				  <div id="datetimepicker2" class="input-append date">
+				    <input type="text" class="datepicker" name="end_date" id="end_date"/>
+				  </div>
+
+                <input type="submit" onclick="filterDownload(event,1);" class="btn btn-primary" value="{% trans 'Refresh' %}" />
+
+                <!--<input type="hidden" name="query" id="query1" value=""/>-->
+
+    </form>
+    {% endif %}
+        <br>
+        Average size of land per product
+        <div class="data-table-container table table-striped table-hover">
+            <table border="1">
+                <tr>
+                {% for key,value in dict_landsize.iteritems %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+                </tr>
+                <tr>
+                {% for key,value in dict_landsize.iteritems %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+                </tr>
+            </table>
+        </div>
+
+        <br>
+        Average cost per product
+        <div class="data-table-container table table-striped table-hover">
+            <table border="1">
+                <tr>
+                {% for key,value in dict_production_cost.iteritems %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+                </tr>
+                <tr>
+                {% for key,value in dict_production_cost.iteritems %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+                </tr>
+            </table>
+        </div>
+        
+        <br>
+        Average Net Income per product
+        <div class="data-table-container table table-striped table-hover">
+            <table border="1">
+                <tr>
+                {% for key,value in dict_avg_net_income.iteritems %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+                </tr>
+                <tr>
+                {% for key,value in dict_avg_net_income.iteritems %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+                </tr>
+            </table>
+        </div>
+        <span class="span12">
+                <div class="data-table-container table table-striped table-hover">
+                    <table border="1">
+
+                    {% for data in survey.datalist%}
+                        <tr>
+                            <td rowspan="3">{{ data.question }}</td>
+                            {% for option in data.options_list %}
+                                <td>{{option.property|title}}</td>
+                            {% endfor %}
+                        </tr><tr>
+                            {% for option in data.options_list %}
+                                <td>This Quarter: {{option.quarterly_value}}</td>
+                            {% endfor %}
+                        </tr><tr>
+                            {% for option in data.options_list %}
+                                <td>Lifetime: {{option.lifetime_value}}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    </table>
+
+                    <!--<table border="1">-->
+                    <!--<tr>-->
+                    <!--<td rowspan="3">Row 1 Cell 1</td>-->
+                    <!--<td>Row 1 Cell 2</td>-->
+                    <!--<td>Row 1 Cell 3</td>-->
+                    <!--<td>Row 1 Cell 3</td>-->
+                    <!--</tr>-->
+
+                    <!--<tr>-->
+                    <!--<td>Row 2 Cell 2</td>-->
+                    <!--<td>Row 2 Cell 3</td>-->
+                    <!--<td>Row 1 Cell 3</td>-->
+                    <!--</tr>-->
+
+                    <!--<tr>-->
+                    <!--<td>Row 2 Cell 2</td>-->
+                    <!--<td>Row 2 Cell 3</td>-->
+                    <!--<td>Row 1 Cell 3</td>-->
+                    <!--</tr>-->
+
+                    <!--</table>-->
+                    {% comment %}
+                    values
+                    <table>
+                    {% for key in mongo_data%}
+                    <tr>
+                        <td>{{key.status}}</td><td>{{key.count}}</td>
+                    </tr>
+                    {% endfor %}
+                    </table>
+
+                    labels
+                    <table>
+                    {% for key in labels%}
+                    <tr>
+                        <td>{{key.status}}</td>
+                    </tr>
+                    {% endfor %}
+                    </table>
+                    {% endcomment %}
+                </div>
+
+            <div style="clear: both;"></div>
+        </span>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script type="text/javascript" src="/static/bower_components/underscore/underscore-min.js"></script>
+    <script type="text/javascript" src="/static/bower_components/backbone/backbone-min.js"></script>
+    <script type="text/javascript" src="/static/js/json2.js"></script>
+    <script type="text/javascript" src="/static/bower_components/backgrid/lib/backgrid.min.js"></script>
+    <script type="text/javascript" src="/static/bower_components/lunr.js/lunr.min.js"></script>
+    <script type="text/javascript" src="/static/bower_components/backbone-pageable/lib/backbone-pageable.min.js"></script>
+    <script type="text/javascript" src="/static/bower_components/backgrid-filter/backgrid-filter.min.js"></script>
+    <script type="text/javascript" src="/static/bower_components/backgrid-paginator/backgrid-paginator.min.js"></script>
+    <script type="text/javascript" src="/static/js/xform.js"></script>
+    <script src="/static/js/data_view.js" type="text/javascript"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript">
+
+            $(function () {
+                $('.datepicker').datepicker({
+                    format: 'yyyy-mm-dd'
+                });
+            });
+
+    </script>
+<script>
+  $( document ).ready(function() {
+        today = getDesiredDate(0);
+        threemonthsFromNow = getDesiredDate(3);
+        console.log("today::" + today);
+        console.log("threemonthsFromNow::" + threemonthsFromNow);
+        $('#start_date').val(today)
+        $('#end_date').val(threemonthsFromNow);
+  });
+
+  function getDesiredDate(months) {
+        var date = new Date();
+        months = parseInt(months);
+
+        if(months > 0){
+            date.setMonth(date.getMonth() + months);
+        }
+
+        var dd = date.getDate();
+        var mm = date.getMonth()+1; //January is 0!
+        var yyyy = date.getFullYear();
+        if(dd<10) {
+            dd='0'+dd
+        }
+        if(mm<10) {
+            mm='0'+mm
+        }
+        formatted_date = yyyy+'-'+mm+'-'+dd;
+        console.log(formatted_date);
+        return formatted_date;
+  }
+
+  function filterDownload(e,formnumber)
+  {
+	  e.preventDefault();
+	  var datetimepicker1 = $('#start_date').val();
+	  if(datetimepicker1 == null || datetimepicker1=='undefined')
+	  {
+	      datetimepicker1 = "";
+	  }
+	  datetimepicker1 = datetimepicker1 + "T00:00:00" ;
+	  var datetimepicker2 = $('#end_date').val();
+	  if(datetimepicker2 == null || datetimepicker2=='undefined')
+	  {
+	      datetimepicker2 = "";
+	  }
+	  datetimepicker2 = datetimepicker2 + "T23:59:59" ;
+      console.log("datetimepicker1::"+datetimepicker1);
+      console.log("datetimepicker2::"+datetimepicker2);
+      document.getElementById('start_date').value = datetimepicker1;
+      document.getElementById('end_date').value = datetimepicker2;
+	  document.getElementById("filter").submit();
+  }
+</script>
+
+{% endblock %}

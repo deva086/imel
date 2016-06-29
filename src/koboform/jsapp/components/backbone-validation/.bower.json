@@ -1,0 +1,14 @@
+{
+  "name": "backbone-validation",
+  "homepage": "https://github.com/thedersen/backbone.validation",
+  "version": "0.9.2",
+  "_release": "0.9.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.9.2",
+    "commit": "b75317aa3604d68818b2facc7a8005253d9dd0fe"
+  },
+  "_source": "git://github.com/thedersen/backbone.validation.git",
+  "_target": "~0.9.1",
+  "_originalSource": "backbone-validation"
+}

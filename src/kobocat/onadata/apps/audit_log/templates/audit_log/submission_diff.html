@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block additional-headers %}
+{% load i18n %}
+
+{% endblock %}
+{% block content %}
+<div id="data" class="data_load"></div>
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script type="text/javascript" src="{{STATIC_URL}}js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/jquery.dataTables.pagination.js"></script>
+<script type="text/javascript" charset="utf-8" src="{{STATIC_URL}}js/sammy-0.7.1.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="{{STATIC_URL}}js/sammy-plugins/sammy.meld-0.7.1.min.js"></script>
+<script type="text/javascript">
+var questions = {};
+var languages = [];
+var app; // sammy app
+// TODO: this re should only accept valid js variable names so numbers/letter/underscore
+var cleanRe = /[\[\]\/]/g; // regular expression used to clean names with slashes
+var cleanReplacement = '_';
+//var numRecords = null;
+//var browsePos = null;
+
+var canEdit = {% if can_edit %}true;{% else %}false;{% endif %}
+// custom testing variables.
+
+var formJSONUrl = "{% url "onadata.apps.logger.views.download_jsonform" username id_string %}";
+var postgresAPIUrl = "{% url 'audit_log:instance_json' username id_string instance_id data_id %}";
+var postgresAPIUrl2 = "{% url 'audit_log:instance_new_json' username id_string instance_id data_id%}";
+//console.log(postgresAPIUrl);
+(function($) {
+	var _isFirstLoad = true;
+	app = $.sammy('#data', function() {
+      		this.use('Meld');
+
+      		// index route
+      this.get('#/', function(context) {
+          /// get the first response object
+          // only re-direct if this is the first time
+          if(_isFirstLoad)
+          	redirectToFirstId(context);
+          else
+          	 history.go(-3);
+          	_isFirstLoad = false;
+         
+      });
+
+       this.get('#/id', function(context) {
+       	_isFirstLoad = false;
+          loadOldData(context, '', false);
+
+      });
+      this.bind('error', {}, function(){
+          console.log('Invalid route requested');
+          //app.setLocation('#/');
+      })
+
+
+      });
+})(jQuery);
+
+function _attachment_url(name, size)
+{
+    return '{% url "onadata.apps.viewer.views.attachment_url" %}' + size + '?media_file=' + '{{ username }}/attachments/' + name;
+}
+$(document).ready(function(){
+	//alert('doc ready');
+
+	$.getJSON(formJSONUrl)
+      .success(function(data){              
+              //console.log(JSON.stringify(data));
+              parseQuestions(data.children);
+              parseLanguages(data.children);
+              $.getJSON(postgresAPIUrl)
+                  .success(function(data){
+                          //todo: count num records before and num records after so we know our starting point
+                          //reDraw(context,data, false);
+                          app.run('#/');
+                          // load id of first record
+                      })
+          });
+
+
+	
+});
+
+</script>
+<script type="text/javascript" charset="utf-8" src="{{STATIC_URL}}js/submission_diff.js"></script>
+
+{% endblock %}

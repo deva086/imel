@@ -1,0 +1,545 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load humanize %}
+{% if show_dashboard %}
+        {% include "dashboard.html" %}
+{% endif %}
+{% block additional-headers %}
+    <link href="{{STATIC_URL}}css/datepicker.css" rel="stylesheet">
+    <style >
+    .data-table-container table {
+        clear: both;
+        display: table !important;
+        overflow-x: auto;
+        width: 98% !important;
+        padding-left: 20px; 
+    }
+
+    .highlight { background-color: #D9EDF7; }
+
+    .table th, .table td {
+        border: 1px solid #dddddd !important;
+        text-align:center !important;
+    }
+    
+    .table thead {
+        font-size:14pt;
+    }    
+    .table th {
+        /*background-color: #A9BFC8 !important;*/
+    }
+    .page-header {
+      text-align:center !important; 
+    }
+
+    .highlight { background-color: #D9EDF7; }
+
+    #report_table, #quantitative_achievement_report_table, #filters {
+        width: 100% !important;
+        overflow: auto;
+        padding-left: 10px; 
+    }
+    .btn {
+      margin-top: -4px  !important; 
+    }
+    #message-container, #error-container { 
+      margin-left: 20px; 
+      display : none ;
+    }
+ 
+    .btn {
+      margin-top: 21px !important; 
+    }
+
+    .result_type {
+      text-align:left !important; 
+    }
+
+    .lomba td { 
+      height: 140px;
+      /*text-align:center !important; */
+      vertical-align: inherit;
+      /*white-space: nowrap;*/
+      -webkit-transform: rotate(-90deg);   
+      -moz-transform: rotate(-90deg);
+      -ms-transform: rotate(-90deg);
+      -o-transform: rotate(-90deg);
+      transform: rotate(-90deg);
+    }
+    /*#FFC001*/
+
+    .modal {
+        display:    none;
+        position:   fixed;
+        z-index:    1000;
+        top:        0;
+        left:       0;
+        height:     100%;
+        width:      100%;
+        background: rgba( 255, 255, 255, .8 ) 
+                    url('/static/images/ring.svg') 
+                    50% 50% 
+                    no-repeat;
+        margin: auto;                    
+    }
+
+    /* When the body has the loading class, we turn
+       the scrollbar off with overflow:hidden */
+    body.loading {
+        overflow: hidden;   
+    }
+
+    /* Anytime the body has the loading class, our
+       modal element will be visible */
+    body.loading .modal {
+        display: block;
+    }
+    </style>
+
+{% endblock %}
+{% block content %}
+    <section id="data-view">
+        <div class="page-header">
+            <h1>{% trans "Monthly Accomplishment Report" %}</h1>
+            <h3>{% trans "REE-CALL Program" %}</h3>
+
+        </div>
+        <div class="row">
+        <!-- -->
+          <div id="date-message-container">
+            <div id="error-container" class="alert alert-danger" role="alert">
+                Please Select a Project
+            </div>
+            <div id="message-container" class="alert alert-success" role="alert">
+                No Data Found
+            </div>
+            <br>
+            <div id="tableset-container" class="data-table-container table table-striped">
+                <div id="filters">
+                <form id="filter" method="post" action="/reports/export-moa-report/" enctype="application/x-www-form-urlencoded">
+                  {% csrf_token %}
+                  <div class="input-append date">
+                      <label>PNGO Name</label>
+                      <select id="pngo" name="pngo">
+                          <option selected="selected" value="custom">Select a PNGO</option>
+                          {% for org in organizations %}
+                          <option value="{{org.id}}">{{org.organization}}</option>
+                          {% endfor %}
+                      </select>
+                  </div>
+                  <div class="input-append date">
+                      <label>Outcome</label>
+                      <select id="outcome" name="outcome">
+                          <option selected="selected" value="custom">All Outcomes</option>
+                          <option value="1">Result 1: Community Based Organisations (CBOs)</option>
+                          <option value="2">Result 2: Sustainable Income and employment</option>
+                          <option value="3">Result 3: Effective and pro poor implementation</option>
+                          <option value="4">Result 4: Strengthened collective and individual actions</option>
+                          
+                      </select>
+                  </div>
+                  <div class="input-append date" id="div-facilitator">
+                      <label>Field Facilitator</label>
+                      <select id="facilitator" name="facilitator">
+                          <option selected="selected" value="custom">Select a Field Facilitator</option>
+                          {% for usermodule_user in userlist %}
+                          <option value="{{usermodule_user.user.username}}">{{ usermodule_user.user.username }}</option>
+                          {% endfor %} 
+                      </select>
+                  </div>
+                  <div class="input-append date" id="div-component">
+                      <label>Component</label>
+                      <select id="component" name="component">
+                          <option selected="selected" value="%">Select a Component</option>
+                          <option value="1">GEM</option>
+                          <option value="2">ANCP: REE-CALL</option>
+                          <option value="3">ANCP: R-WASH</option>
+                          <option value="4">Thankyou Water WASH</option>
+                          <option value="5">Unrestricted</option>
+                          <option value="6">PROTIC</option>
+                          <option value="7">iMEL</option>
+                          <option value="8">LHDP</option>
+                          <option value="9">H&amp;S Davidson</option>
+                          <option value="10">EDP</option>
+                          <option value="11">SD</option>
+                          <option value="12">Others</option>
+                      </select>
+                  </div>
+                  <br/>
+
+                  <div id="datetimepicker1" class="input-append date">
+                      <label>From</label>
+                      <input type="text" class="datepicker" name="from_date" id="from_date" onkeydown="return false;" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])"/>
+                  </div>
+                  <div id="datetimepicker2" class="input-append date">
+                      <label>To</label>
+                      <input type="text" class="datepicker" name="to_date" id="to_date" onkeydown="return false;" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])"/>
+                  </div>
+                  <input type="hidden" name="export" id="export"/>
+                  <!--<input id="btn_report" type="submit" class="btn btn-primary" value="{% trans 'Generate Report' %}" /> -->
+                  <input id="btn_report" type="submit" onclick="filterDownload(event,1);" class="btn btn-primary" value="{% trans 'Generate Report' %}" />
+                  <input id="btn_export" type="submit" onclick="filterDownload(event,2);" class="btn btn-primary" value="{% trans 'Export' %}" />
+                  </form>
+                  
+                  
+                </div>
+
+                <div id="quantitative_achievement_report_table">
+                      {% comment %}
+                  <h3>A. Quantitative Achievement</h3>
+                  <table border="1">
+                    <tbody>
+                      <tr>
+                        <th rowspan="2">S/N</th>
+                        <th rowspan="2">Outcome/Activities</th>
+                        <th colspan="3">Target vs. Achievement</th>
+                        <th colspan="5">Person with disabilities</th>
+                        <th colspan="5">Person without disabilities</th>
+                        <th rowspan="2">Progress</th>
+                        <th rowspan="2">Name of Component</th>
+                      </tr>
+                      <tr class="lomba">
+                        <td>Target</td>
+                        <td>Achievement</td>
+                        <td>Achievement Cumulative</td>
+                        <td>Male</td>
+                        <td>Female</td>
+                        <td>Boy</td>
+                        <td>Girl</td>
+                        <td>Total</td>
+                        <td>Male</td>
+                        <td>Female</td>
+                        <td>Boy</td>
+                        <td>Girl</td>
+                        <td>Total</td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <p>Result-1: Community Based Organisations (CBOs) and local government institutions are able to anticipate possible impact of climate change, disaster and taking appropriate measures accordingly.</p>
+                        </td>
+                        <td colspan="15"></td>
+                      </tr>
+                      {% for data in data_array %}
+                        <tr>
+                        {% if data.result_type_row  == '1' %}                      
+                            <!-- <tr> -->
+                              <td colspan="17">
+                                <p class="result_type">{{data.result_type_val}}</p>
+                              </td>
+                              
+                            <!-- </tr> -->
+                        {% else %}  
+                            <td>{{data.sn}}</td>
+                            <td>{{data.outcome_activities}}</td>
+                            <td>{{data.trg_vs_ach_target}}</td>
+                            <td>{{data.trg_vs_ach_achievement}}</td>
+                            <td>{{data.trg_vs_ach_achievement_cumulative}}</td>
+                            <td>{{data.prsn_w_dis_male}}</td>
+                            <td>{{data.prsn_w_dis_female}}</td>
+                            <td>{{data.prsn_w_dis_boy}}</td>
+                            <td>{{data.prsn_w_dis_girl}}</td>
+                            <td>{{data.prsn_w_dis_total}}</td>
+                            <td>{{data.prsn_wo_dis_male}}</td>
+                            <td>{{data.prsn_wo_dis_female}}</td>
+                            <td>{{data.prsn_wo_dis_boy}}</td>
+                            <td>{{data.prsn_wo_dis_girl}}</td>
+                            <td>{{data.prsn_wo_dis_total}}</td>
+                            <td>{{data.progress}}</td>
+                            <td>{{data.name_component}}</td>
+                        {% endif %}  
+                        </tr>
+                      {% endfor%}
+                      {% endcomment %}
+
+                      <div id="ajax-container">
+                        
+                      </div>
+                    </tbody>
+                  </table>
+                </div> <!-- div end quantitative_achievement_report_table-->
+            </div> <!-- div tableset-container-->
+            </div><!-- div form-table-->
+        </div> <!-- div row-->
+
+        <div class="modal"><!-- Place at bottom of page --></div>
+    </section>
+{% endblock %}
+{% block below-content %}
+{% endblock %}
+{% block javascript %}
+    {{ block.super }}
+    <script type="text/javascript" src="{{STATIC_URL}}js/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.searchable-ie-1.1.0.min.js"></script>
+    <script type="text/javascript" src="/static/js/submission_merge.js"></script>
+    <script type="text/javascript">
+      // document.getElementById("error-container").style.display = "none";
+      // document.getElementById("message-container").style.display = "none";
+      // document.getElementById("error-container").style.display = "block";
+      var response_data_array = []
+      $(function () {
+          // document.getElementById("form-table").style.display = "none";
+          $('.datepicker').datepicker({
+              format: 'yyyy-mm-dd',
+              endDate: '+0d'
+          });
+          var today = getDesiredDate(0);
+          var one_month_ago = getDesiredDate(-1);
+          $('#from_date').val(one_month_ago);
+          $('#to_date').val(today);
+          
+      });
+
+      function getDesiredDate(months) {
+          var date = new Date();
+          months = parseInt(months);
+          date.setMonth(date.getMonth() + months);
+          var dd = date.getDate();
+          var mm = date.getMonth()+1; //January is 0!
+          var yyyy = date.getFullYear();
+          if(dd<10) {
+              dd='0'+dd
+          }
+          if(mm<10) {
+              mm='0'+mm
+          }
+          formatted_date = yyyy+'-'+mm+'-'+dd;
+          return formatted_date;
+      }
+
+      function isDate(val) {
+          var d = new Date(val);
+          return !isNaN(d.valueOf());
+      }
+
+      function filterDownload(e,formnumber) {
+        e.preventDefault();
+      // $('#btn_report').click(function(){
+        filter_json = {};
+        var pngo = $('#pngo').val();
+        var outcome = $('#outcome').val();
+        var facilitator = $('#facilitator').val();
+        var component = $('#component').val();
+        var from_date = $('#from_date').val();
+        var to_date = $('#to_date').val();
+        if(pngo !== 'custom')
+        {
+          filter_json.pngo = pngo;
+        }
+        // if(outcome !== 'custom')
+        // {
+        filter_json.outcome = outcome;
+        // }
+        if(facilitator !== 'custom')
+        {
+          filter_json.submitted_by = facilitator;
+          // filter_json.submitted_by = 'himel';
+        }else{
+          org_facilitators = [] ; 
+          $("#facilitator > option").each(function() {
+              if(this.value !== 'custom'){
+                org_facilitators.push(this.value);
+              }
+          });
+          filter_json.submitted_by = org_facilitators;
+        }
+
+        filter_json.component = component;
+        if(from_date == null || from_date=='undefined' || !from_date )
+        {
+            from_date = "";
+        }else{
+          filter_json.fromdate = from_date;
+        }
+        if(to_date == null || to_date=='undefined' || !to_date )
+        {
+            to_date = "";
+        }else{
+          filter_json.todate = to_date;
+        }
+
+        var startDate = new Date(from_date);
+        var endDate = new Date(to_date);
+        if(isDate(from_date) && isDate(to_date) && (startDate <= endDate) ){
+          $('#error-container').empty();
+          document.getElementById("error-container").style.display = "none";
+          if(formnumber === 1) {
+              setfilter_and_execute(filter_json);
+          } else {
+            // console.log(JSON.stringify(filter_json));
+            if(response_data_array.length > 0){
+              // console.log(response_data_array);
+              $('#export').val(JSON.stringify(response_data_array));
+              $('#filter').submit();
+
+            }
+          }
+        }else{
+          document.getElementById("error-container").style.display = "block";
+          $('#error-container').empty();
+          $('#error-container').append("<p> *Dates must be non-empty</p>");
+          $('#error-container').append("<p> *'From' Date must be less than 'To' Date</p>");
+          $('#error-container').append("<p> Please choose a valid date using the datepicker</p>");
+        }
+      // });
+      }
+      
+      $('#pngo').change(function() {
+        var org_id = $('#pngo').val();
+        $.ajax({
+           url:'/reports/get-org-users/',
+           type:'GET',
+           data: {org_id:org_id},
+           success: function( data ) 
+           {
+            var label = '<label>Field Facilitator</label>';
+            var select = '<select id="facilitator" name="facilitator">';
+            select += '<option selected="selected" value="custom">Select a Field Facilitator</option>';
+            if(data.length > 0)
+            {
+              
+              data.forEach(function(option) 
+              {
+                select += '<option value="'+option.name+'">'+option.name+'</option>';
+              });
+            }
+            select += '</select>';
+            $('#div-facilitator').empty();
+            $('#div-facilitator').append(label);
+            $('#div-facilitator').append(select);
+           }, //end success fn
+           error: function(){
+               // $('#animate').remove();
+               // $('#message-container').empty();
+               // $('#message-container').append('Error Occured, Try Again');
+               // document.getElementById("message-container").style.display = "block";
+               console.log('error');
+           } 
+         }); // end ajax
+      });
+
+      function setfilter_and_execute(filter_json){
+         $.ajax({
+            url:'/merge/get_merge_json/',
+            // url:'http://192.168.21.230:8001/merge/get_merge_json/',
+            type:'POST',
+            data: filter_json,
+            // dataType: 'json',
+            // <tr>
+            // {% if data.result_type_row  == '1' %}                      
+            //     <!-- <tr> -->
+            //       <td colspan="17">
+            //         <p class="result_type">{{data.result_type_val}}</p>
+            //       </td>
+                  
+            //     <!-- </tr> -->
+            // {% else %}  
+                // <td>{{data.sn}}</td>
+                // <td>{{data.outcome_activities}}</td>
+                // <td>{{data.trg_vs_ach_target}}</td>
+                // <td>{{data.trg_vs_ach_achievement}}</td>
+                // <td>{{data.trg_vs_ach_achievement_cumulative}}</td>
+                // <td>{{data.prsn_w_dis_male}}</td>
+                // <td>{{data.prsn_w_dis_female}}</td>
+                // <td>{{data.prsn_w_dis_boy}}</td>
+                // <td>{{data.prsn_w_dis_girl}}</td>
+                // <td>{{data.prsn_w_dis_total}}</td>
+                // <td>{{data.prsn_wo_dis_male}}</td>
+                // <td>{{data.prsn_wo_dis_female}}</td>
+                // <td>{{data.prsn_wo_dis_boy}}</td>
+                // <td>{{data.prsn_wo_dis_girl}}</td>
+                // <td>{{data.prsn_wo_dis_total}}</td>
+                // <td>{{data.progress}}</td>
+                // <td>{{data.name_component}}</td>
+            // {% endif %}  
+            // </tr>
+            success: function( data ) 
+            {
+              console.log('here');
+              response_data_array = data;
+              // console.log('returned json:: '+JSON.stringify(json));
+              var header = '<h3>A. Quantitative Achievement</h3>';
+              tableset_container_contents = '';
+              tableset_container_contents = '<table border="1">';
+              tableset_container_contents += '<tbody>' ;
+              tableset_container_contents += '<tr>' ;
+              tableset_container_contents += '<th rowspan="2">S/N</th>' ;
+              tableset_container_contents += '<th rowspan="2">Outcome/Activities</th>' ;
+              tableset_container_contents += '<th colspan="3">Target vs. Achievement</th>' ;
+              tableset_container_contents += '<th colspan="5">Person with disabilities</th>' ;
+              tableset_container_contents += '<th colspan="5">Person without disabilities</th>' ;
+              // tableset_container_contents += '<th rowspan="2">Progress</th>' ;
+              // tableset_container_contents += '<th rowspan="2">Name of Component</th>' ;
+              tableset_container_contents += '</tr>' ;
+              tableset_container_contents += '<tr class="lomba">' ;
+              tableset_container_contents += '<td>Target</td>' ;
+              tableset_container_contents += '<td>Achievement</td>' ;
+              tableset_container_contents += '<td>Achievement Cumulative</td>' ;
+
+              tableset_container_contents += '<td>Male</td>' ;
+              tableset_container_contents += '<td>Female</td>' ;
+              tableset_container_contents += '<td>Boy</td>' ;
+              tableset_container_contents += '<td>Girl</td>' ;
+              tableset_container_contents += '<td>Total</td>' ;
+
+              tableset_container_contents += '<td>Male</td>' ;
+              tableset_container_contents += '<td>Female</td>' ;
+              tableset_container_contents += '<td>Boy</td>' ;
+              tableset_container_contents += '<td>Girl</td>' ;
+              tableset_container_contents += '<td>Total</td>' ;
+              tableset_container_contents += '</tr>' ;
+              
+                
+              
+              if(data.length > 0)
+              {
+                data.forEach(function(option) 
+                {
+                  tableset_container_contents += '<tr>'
+                   // tableset_container_contents += '<table border="1">' ;
+                   // tableset_container_contents += '<tr><thead><th colspan="5">Data Display Format  (aggregate)</td>' ;
+                   // console.log(option)
+                   tableset_container_contents += '<td>'+option.sn + '</td>' ;
+                   tableset_container_contents += '<td>'+option.outcome_activities + '</td>' ;
+                   tableset_container_contents += '<td>'+option.trg_vs_ach_target + '</td>' ;
+                   tableset_container_contents += '<td>'+option.trg_vs_ach_achievement + '</td>' ;
+                   tableset_container_contents += '<td>'+option.trg_vs_ach_achievement_cumulative + '</td>';
+                   tableset_container_contents += '<td>'+option.prsn_w_dis_male + '</td>' ;
+                   tableset_container_contents += '<td>'+option.prsn_w_dis_female + '</td>' ;
+                   tableset_container_contents += '<td>'+option.prsn_w_dis_boy + '</td>' ;
+                   tableset_container_contents += '<td>'+option.prsn_w_dis_girl + '</td>' ;
+                   tableset_container_contents += '<td>'+option.prsn_w_dis_total + '</td>' ;
+                   tableset_container_contents += '<td>'+option.prsn_wo_dis_male + '</td>' ;
+                   tableset_container_contents += '<td>'+option.prsn_wo_dis_female + '</td>' ;
+                   tableset_container_contents += '<td>'+option.prsn_wo_dis_boy + '</td>' ;
+                   tableset_container_contents += '<td>'+option.prsn_wo_dis_girl + '</td>' ;
+                   tableset_container_contents += '<td>'+option.prsn_wo_dis_total + '</td>' ;
+                   // tableset_container_contents += '<td>'+option.progress + '</td>' ;
+                   // tableset_container_contents += '<td>'+option.name_component + '</td>' ;
+                   tableset_container_contents += '</tr>'
+                });
+              }
+              tableset_container_contents += '</table>';
+              tableset_container_contents += '</tbody>' ;
+              tableset_container_contents += '</table>' ;
+              $('#quantitative_achievement_report_table').empty();
+              $('#quantitative_achievement_report_table').append(header);
+              $('#quantitative_achievement_report_table').append(tableset_container_contents);
+            }, //end success fn
+            error: function(){
+                // $('#animate').remove();
+                // $('#message-container').empty();
+                // $('#message-container').append('Error Occured, Try Again');
+                // document.getElementById("message-container").style.display = "block";
+                console.log('error');
+            } 
+          }); // end ajax
+      }
+      $body = $("body");
+
+      $(document).on({
+          ajaxStart: function() { $body.addClass("loading");    },
+          ajaxStop: function() { $body.removeClass("loading"); }    
+      });
+    </script>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block additional-headers %}
+{% load i18n %}
+
+{% endblock %}
+{% block content %}
+<div id="data" class="data_load"></div>
+<input type="button" id="test_json" value="test_json"/>
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+
+<script type="text/javascript">
+
+
+// custom testing variables.
+
+//monthly_target_form2
+//daily_accomplishment_form
+//
+
+
+//var postgresAPIUrl = "{% url 'audit_log:instance_json_merge' 'ratna' 'daily_accomplishment_form' '321'%}";
+var test_json_url = "{% url 'merge_report_gen:test_json' 'ratna' '2016-03-01' '2016-03-14' %}";
+
+$(document).ready(function(){
+	//alert('doc ready');
+  var userid = 'himel';
+  var form_id_string = 'monthly_target_form2';
+  var instance_id = 323;
+
+  var formJSONUrl = "/"+userid+"/forms/"+form_id_string+"/form.json"
+  var postgresAPIUrl = "/audit/"+userid+"/forms/"+form_id_string+"/get_json/"+instance_id;
+	$.getJSON(formJSONUrl)
+      .success(function(data){              
+              //console.log('form data'+JSON.stringify(data));
+              parseQuestions(data.children);
+              parseLanguages(data.children);
+              $.getJSON(postgresAPIUrl)
+                  .success(function(data){
+                    //console.log(JSON.stringify(data));
+                           generateReportData(data, false,true,form_id_string,instance_id);
+                  })
+          });
+
+      $("#test_json").click(function(){
+        //alert('testing');
+          $.getJSON(test_json_url)
+                .success(function(data){ 
+                  console.log('test_json data'+JSON.stringify(data));
+          })
+      });
+});
+
+</script>
+<script type="text/javascript" charset="utf-8" src="{{STATIC_URL}}js/submission_merge.js"></script>
+
+{% endblock %}

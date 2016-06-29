@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<style >
+    body {
+        background-image:url('{{STATIC_URL}}/images/signup_photo.jpg'); background-size: cover;
+    }
+</style>
+<head>
+
+
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+{% block additional-headers %}
+ <link rel="icon" type="image/x-icon" href="{{STATIC_URL}}images/favicon.ico" />
+    <!-- iPhone + iPad icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{STATIC_URL}}images/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{STATIC_URL}}images/apple-touch-icon-72x72-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" href="{{STATIC_URL}}img/apple-touch-icon-precomposed.png">
+  <link rel="apple-touch-icon" href="{{STATIC_URL}}images/apple-touch-icon.png">
+<link href="{{STATIC_URL}}css/login.css" rel="stylesheet">
+{% endblock %}
+</head>
+<body >
+
+  <div class="registration__bg">
+    
+  <!-- <form method="post" action="." class="registration registration--login"> -->
+  <form id="login_form" method="post" action="/usermodule/login/" class="registration registration--login">  
+  <div class="registration--logo">
+    <a href="/usermodule/login/"><img src="{{STATIC_URL}}images/login_box_logo.png"/></a>
+  </div>
+    {% csrf_token %}
+    <p><label for="id_username">Username:</label> <input type="text" name="username" value="" size="20" /></p>
+
+    <p><label for="id_password">Password:</label> <input type="password" name="password" value="" size="20" /></p>
+    <input type="submit" value="Login" class="registration__action"/>
+  </form>
+</div>
+<!-- <div class="logo_foot">
+  <img src="{{STATIC_URL}}/images/oxfam_logo_foot.png"/>
+</div> -->
+</body>
+</html>
+

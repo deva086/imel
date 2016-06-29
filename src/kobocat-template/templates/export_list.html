@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+
+
+{% block additional-headers %}
+{% load i18n %}
+
+<link href="{{STATIC_URL}}css/bootstrap-multiselect.css" rel="stylesheet">
+<div class="sub-header-bar">
+  <div class="container__wide">
+    <a class="sub-header__back" href="{% url "onadata.apps.main.views.show" xform.user.username xform.id_string %}"><i class="fa fa-chevron-left"></i> {% trans "Return to" %} {{ xform.title }}</a>
+  </div>
+</div>
+
+<header class="data-page__header">
+    <hgroup class="container">
+      <h1>{{ export_type_name|upper }} {% blocktrans %}Exports{% endblocktrans %}</h1>
+    </hgroup>
+</header>
+
+{% endblock %}
+
+{% block content %}
+{% load i18n %}
+<section id="export-downloads">
+
+    {% if user.is_authenticated %}
+    <div class="row">
+    <span class="span12">
+            <form class="form form-horizontal" id="search_form" action="{% url "onadata.apps.viewer.views.create_export" username xform.id_string export_type %}" method="post" enctype="application/x-www-form-urlencoded">
+                {% csrf_token %}
+                <span style='float:middle;'>
+                <div class="container_table">
+                    <table class="table table-bordered" id="filter-table" style="margin-left:.3cm;">
+                        <thead>
+                            <tr>
+                                <th width="40%" style="text-align:center">Search Criteria</th>
+                                <th width="40%" style="text-align:center">Value</th>
+                                <th width="20%" style="text-align:center"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="row0">
+                                <td style="text-align:center">
+                                    <div class="col-sm-5">
+                                        <p>Submission Date</p>
+                                    </div>
+                                </td>
+                                <td id="td-B-0" style="text-align:left">
+                                    <p>From:</p>
+                                    <div id="datetimepicker1" class="input-append date">
+                                        <input type="text" class="datepicker" name="start_date" id="start_date"/>
+                                    </div><br>
+                                    <p>To:</p>
+                                    <div id="datetimepicker2" class="input-append date">
+                                        <input type="text" class="datepicker" name="end_date" id="end_date"/>
+                                    </div>
+                                </td>
+                                <td style="text-align:center">
+                                    <div class="col-xs-2">
+                                        <a class="btn btn-warning btn-circle btn-outline"  onclick="removeRow(row0)"  data-target="#confirm-delete"><i class="glyphicon glyphicon-remove"></i>x</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr id="row1">
+                                <td style="text-align:center">
+                                    <div class="col-sm-5">
+                                        <p>Submitted By</p>
+                                    </div>
+                                </td>
+                                <td id="td-B-1" style="text-align:center">
+                                    <div class="col-sm-5">
+                                       <select id ="userlist" class="userlist" multiple="multiple">
+                                            {# <option value="custom">Select a User</option> #}
+                                        </select>
+                                    </div>
+                                </td>
+                                <td style="text-align:center">
+                                    <div class="col-xs-2">
+                                        <a class="btn btn-warning btn-circle btn-outline"  onclick="removeRow(row1)"  data-target="#confirm-delete"><i class="glyphicon glyphicon-remove"></i>x</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <input type="button" style="margin-left:12px" id="add-more" class="btn btn-primary" value="{% trans 'Add More' %}"></input>
+                    <input id="export-button" type="submit" onclick="filterDownload(event,1);" class="btn btn-primary" value="{% trans 'Export' %}" />
+
+                 <input type="hidden" name="query" id="query1" value=""/>
+                </div>
+            </form>
+    </span>
+    </div>
+    <!-- <form action="{% url "onadata.apps.viewer.views.create_export" username xform.id_string export_type %}" method="post" enctype="application/x-www-form-urlencoded"> -->
+        <!-- {% csrf_token %} -->
+            <!-- <span style='float:middle;'> -->
+              <!-- <div> -->
+                <!-- Date From:
+      				  <div id="datetimepicker1" class="input-append date">
+                  <input type="text" class="datepicker" name="start_date" id="start_date"/>
+      					</div>
+
+      				  Date To:
+      				  <div id="datetimepicker2" class="input-append date">
+      					  <input type="text" class="datepicker" name="end_date" id="end_date"/>
+      					</div> -->
+
+                <!-- <input id="export-button" type="submit" onclick="filterDownload(event,1);" class="btn btn-primary" value="{% trans 'Export' %}" />
+
+                 <input type="hidden" name="query" id="query1" value=""/> -->
+                <!--<input type="submit" class="btn btn-primary" value="{% trans 'Export' %}" />-->
+
+                {% comment %}
+                {% if export_type == 'xls' or export_type == 'csv' %}
+                  <a href="#advanced-export-modal" role="button" class="btn" data-toggle="modal">{% trans "Advanced Export" %}</a>
+                {% endif %}
+                {% endcomment %}
+            <!-- </div> -->
+            <!--<div class="form-group">-->
+                <!--From: <input type="text" class="datepicker" name="start_date" id="start_date"/>-->
+                <!--To: <input type="text" class="datepicker" name="end_date" id="end_date"/>-->
+            <!--</div>-->
+            <!-- </span> -->
+    <!-- </form> -->
+    {% endif %}
+    <div id="advanced-export-modal" class="modal hide fade">
+      <form action="{% url "onadata.apps.viewer.views.create_export" username xform.id_string export_type %}" method="post" enctype="application/x-www-form-urlencoded">
+        {% csrf_token %}
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h3>{% trans "Advanced Export" %}</h3>
+        </div>
+        {% if export_type == 'external' %}
+            <div class="modal-body">
+              <label>{% trans "Template to use for the export" %}</label>
+              <select id="external_export_metadata" name="meta" class="span2">
+                {% for meta in metas %}
+                <option value="{{ meta.id }}">{% trans meta.data_value %}</option>
+                {% endfor %}
+              </select>
+        </div>
+        {% else %}
+        <div class="modal-body">
+          <label>{% trans "Delimiter to use to separate group names from field names" %}</label>
+          <select id="options-group_delimiter" name="options[group_delimiter]" class="span2">
+            <option value=".">. ({% trans "Dot" %})</option>
+            <option value="/" selected>/ ({% trans "Slash" %})</option>
+          </select>
+          <label class="checkbox">
+            <input type="checkbox" name="options[dont_split_select_multiples]" value="yes" />
+            {% trans "DONT split select multiple choice answers into separate columns" %}
+          </label>
+        </div>
+        {% endif %}
+        <div class="modal-footer">
+          <button class="btn" data-dismiss="modal" aria-hidden="true">{% trans "Cancel" %}</button>
+          <input type="hidden" name="query" id="query2" value=""/>
+          <input type="submit" onclick="filterDownload(event,2);" class="btn large btn-primary" value="{% trans "Create Export" %}" />
+        </div>
+      </form>
+    </div>
+    
+  <table id="forms-table" class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>{% trans "Filename" %}</th>
+        <th>{% trans "Date Created" %}</th>
+        <th>{% trans "Delete" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for export in exports %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>
+            {% if not export.is_pending %}
+                {% if export.is_successful %}
+                    <a href="{% url "onadata.apps.viewer.views.export_download" username xform.id_string export.export_type export.filename %}">{{ export.filename }}</a>
+                {% else %}
+                    Failed
+                {% endif %}
+            {% else %}
+              <span class="status">{% trans "Pending ..." %}</span>
+              <a href="#" class="refresh-export-progress" data-role="refresh-export-progress" data-export="{{ export.id|stringformat:"d" }}">{% trans "Click to refresh" %}</a>
+            {% endif %}
+        </td>
+        <td>{{ export.created_on }}</td>
+        <td>
+            <form action="{% url "onadata.apps.viewer.views.delete_export" username xform.id_string export_type %}" method="post" enctype="application/x-www-form-urlencoded">
+              {% csrf_token %}
+                <div id="delete-{{ export.id|stringformat:"d" }}" class="modal hide fade">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h3>{% trans "Delete Export" %}</h3>
+                    </div>
+                    <div class="modal-body">
+                        <p>{% trans "Are you sure you want to delete this export?" %}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" class="btn" data-dismiss="modal">{% trans "Cancel" %}</a>
+                        <input type="submit" class="btn btn-primary" value="{% trans 'Delete' %}" />
+                    </div>
+                </div>
+              <span style="float:middle;">
+              <div>
+                  <input type="hidden" name="export_id" value="{{ export.id|stringformat:"d" }}">
+                  <a data-toggle="modal" href="#delete-{{ export.id|stringformat:"d" }}" data-backdrop="true" data-keyboard="true">
+                      <i class="fa fa-trash-o"></i>
+                  </a>
+                </div>
+              </span>
+            </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+<!-- <section id="data-view">
+  
+</section> -->
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+<script type="text/javascript" src="{{STATIC_URL}}js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/jquery.dataTables.pagination.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/form_actions.js"></script>
+<script type="text/javascript" charset="utf-8" src="{{STATIC_URL}}js/underscore-min.js"></script>
+<script type="text/javascript" charset="utf-8" src="{{STATIC_URL}}js/export_list.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/bootstrap-datepicker.js"></script>
+
+<script type="text/javascript" src="/static/bower_components/underscore/underscore-min.js"></script>
+<script type="text/javascript" src="/static/bower_components/backbone/backbone-min.js"></script>
+<script type="text/javascript" src="/static/js/json2.js"></script>
+<script type="text/javascript" src="/static/bower_components/backgrid/lib/backgrid.min.js"></script>
+<script type="text/javascript" src="/static/bower_components/lunr.js/lunr.min.js"></script>
+<script type="text/javascript" src="/static/bower_components/backbone-pageable/lib/backbone-pageable.min.js"></script>
+<script type="text/javascript" src="/static/bower_components/backgrid-filter/backgrid-filter.min.js"></script>
+<script type="text/javascript" src="/static/bower_components/backgrid-paginator/backgrid-paginator.min.js"></script>
+<script type="text/javascript" src="/static/js/xform.js"></script>
+<script type="text/javascript" src="/static/js/data_view.js"></script>
+<script type="text/javascript" src="/static/js/data_view_extra.js"></script>
+<script type="text/javascript" src="/static/js/instance.js"></script>
+<script src="/static/js/moment.js" type="text/javascript"></script>
+<script src="/static/js/laconic.js" type="text/javascript"></script>
+<script type="text/javascript" src="{{STATIC_URL}}js/bootstrap-multiselect.js"></script>
+<script type="text/javascript">
+      $(function () {
+          $('.datepicker').datepicker({
+              format: 'yyyy-mm-dd'
+          });
+      });
+</script>
+
+<script type="text/javascript">
+    var formJSONUrl = "{% url "onadata.apps.logger.views.download_jsonform" owner.username xform.id_string %}";
+    var mongoAPIUrl = "{% url "onadata.apps.main.views.api" owner.username xform.id_string %}";
+    var views, sideBarViews, multiView, slickView;
+    var filtered_data = new Array();
+    var numDefaultColumns = 30;//number of columns to show by default
+    var instance_view_url = "{% url "onadata.apps.viewer.views.instance" owner.username xform.id_string %}";
+    var dataView;
+    var i = 3 ;
+        // flag == true means form has username meta enabled so can be filtered with it
+        // var flag = "{{flag}}" ; 
+        // flag = (flag.toLowerCase() === "true");
+        
+        // ========== start:old code ==========================================
+        //getting data list of users who's submitted data current user can view from view.
+        // var user_list = {{ users_submitted_by|safe }} ;
+        // var allowed_users = 0 ;
+        // var formatted_list = "["
+        // for(loop = 0 ; loop < user_list.length; loop++,allowed_users = loop){
+        //     formatted_list += '"' + user_list[loop] + '",'
+        //     $(".userlist").append(
+        //          $('<option></option>')
+        //                 .val(user_list[loop])
+        //                 .html(user_list[loop]));
+        // }
+
+        // formatted_list = formatted_list.substring(0, (formatted_list.length -1 )) + ']';
+        // ========== start:old code ==========================================
+
+        // ========== start:new code ==========================================
+        $('#userlist').multiselect({ enableClickableOptGroups: true, maxHeight: 150});
+        var allowed_users = 0 ;
+        var formatted_list = "["
+        var optgroups = {{users_submitted_by2 | safe}}
+        optgroups.forEach(function(group){
+           allowed_users += group.children.length;
+           group.children.forEach(function(child){
+               formatted_list += '"' + child.value + '",'
+           });
+        })
+        formatted_list = formatted_list.substring(0, (formatted_list.length -1 )) + ']';
+        // flag = true
+        $('#userlist').multiselect('dataprovider', optgroups);
+        // ========== end:new code ==========================================
+        var initial_query = '{ "$or" : [{ "_submitted_by": { "$in" : ' + formatted_list + ' } }' ;
+        initial_query += ' , { "username": { "$in" : ' + formatted_list + ' } } ] }';
+        if (allowed_users == 0 ){ // || !flag
+            initial_query = '{}'
+        }
+        
+    // console.log("formatted_list::"+formatted_list);
+    $(document).ready(function () {
+        dataView = new FH.DataTableView({
+            el: '.data-table-container',
+            formUrl: formJSONUrl,
+            dataUrl: mongoAPIUrl
+        });
+      });
+</script>
+
+<script type="text/javascript">
+    var progress_url = '{% url "onadata.apps.viewer.views.export_progress" username xform.id_string export_type %}';
+</script>
+<script>
+  $( document ).ready(function() {
+        today = getDesiredDate(0);
+        threemonthsFromNow = getDesiredDate(3);
+        $('#start_date').val(today)
+        $('#end_date').val(threemonthsFromNow);
+  });
+
+  function getDesiredDate(months) {
+        var date = new Date();
+        months = parseInt(months);
+
+        if(months > 0){
+            date.setMonth(date.getMonth() + months);
+        }
+
+        var dd = date.getDate();
+        var mm = date.getMonth()+1; //January is 0!
+        var yyyy = date.getFullYear();
+        if(dd<10) {
+            dd='0'+dd
+        }
+        if(mm<10) {
+            mm='0'+mm
+        }
+        formatted_date = yyyy+'-'+mm+'-'+dd;
+        // console.log(formatted_date);
+        return formatted_date;
+  }
+
+  function filterDownload(e,formnumber)
+  {
+	  e.preventDefault();
+	  var datetimepicker1 = $('#start_date').val();
+	  if(datetimepicker1 == null || datetimepicker1=='undefined')
+	  {
+	      datetimepicker1 = "";
+	  }
+	  datetimepicker1 = datetimepicker1 + "T12:00:00.000+06:00" ;
+	  var datetimepicker2 = $('#end_date').val();
+	  if(datetimepicker2 == null || datetimepicker2=='undefined')
+	  {
+	      datetimepicker2 = "";
+	  }
+	  datetimepicker2 = datetimepicker2 + "T23:59:59.000+06:00" ;
+	  var query = "";
+	  //alert("in filter");
+	  //{&quot;_submission_time&quot;:{&quot;$gte&quot;:&quot;2015-07-28T05:38:24&quot;,&quot;$lt&quot;:&quot;2015-07-28T05:38:30&quot;}}
+	  if(datetimepicker1.length>0 && datetimepicker2.length>0)
+	  {
+			query = '{"_submission_time":{"$gte":"'+datetimepicker1+'","$lte":"'+
+					datetimepicker2+'"}}';
+	  }
+	  else if(datetimepicker1.length>0)
+	  {
+		  query = '{"_submission_time":{"$gte":"'+datetimepicker1+'"}}';
+	  }
+	  else if(datetimepicker2.length>0)
+	  {
+		  query = '{"_submission_time":{"$lte":"'+
+					datetimepicker2+'"}}';
+	  }
+    query = getQuery();
+	  query = query.trim();
+	  // alert(query);
+	  $('#query'+formnumber).val(query);
+	  if(formnumber==1)
+	  {
+		$( "form:first" ).submit()
+	  }
+	  else
+	  {
+		  $( "form:second" ).submit()
+	  }
+  }
+</script>
+{% endblock %}

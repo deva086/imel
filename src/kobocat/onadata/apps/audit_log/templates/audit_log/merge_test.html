@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block additional-headers %}
+{% load i18n %}
+
+{% endblock %}
+{% block content %}
+<div id="data" class="data_load"></div>
+<input type="button" id="test_json" value="test_json"/>
+{% endblock %}
+
+{% block javascript %}
+{{ block.super }}
+
+<script type="text/javascript" charset="utf-8" src="{{STATIC_URL}}js/submission_merge.js"></script>
+
+{% endblock %}

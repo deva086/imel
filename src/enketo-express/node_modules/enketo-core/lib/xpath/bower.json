@@ -1,0 +1,26 @@
+{
+  "name": "enketo-xpathjs",
+  "version": "1.2.0",
+  "homepage": "https://github.com/enketo/enketo-xpathjs",
+  "authors": [
+    "Martijn van de Rijdt <martijn@enketo.org>"
+  ],
+  "description": "JS implementation of XPath extended with OpenRosa functions and the date datatype",
+  "main": "build/enketo-xpathjs.min.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "XPath",
+    "Enketo",
+    "ODK"
+  ],
+  "license": "GPLv3",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

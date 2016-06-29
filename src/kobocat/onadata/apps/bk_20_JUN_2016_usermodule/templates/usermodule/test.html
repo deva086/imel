@@ -1,0 +1,539 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block additional-headers %}
+{% load i18n %}
+<link href="/static/bower_components/backgrid/lib/backgrid.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/bower_components/backgrid-filter/backgrid-filter.min.css" />
+<link rel="stylesheet" href="/static/bower_components/backgrid-paginator/backgrid-paginator.min.css" />
+<link href="/static/css/data_view.css" rel="stylesheet">
+<link href="/static/css/backbone-ui-min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+
+<div class="sub-header-bar">
+  <div class="container__wide">
+    <a class="sub-header__back" href="{% url "onadata.apps.main.views.show" xform.user.username xform.id_string %}"><i class="fa fa-chevron-left"></i> {% trans "Return to" %} {{ xform.title }}</a>
+  </div>
+</div>
+
+<header class="data-page__header">
+    <hgroup class="container">
+      <h1>{% trans "Data View" %}</h1>
+    </hgroup>
+</header>
+
+<style >
+.data-table-container table {
+    clear: both;
+    display: table !important;
+    overflow-x: auto;
+    width: 98% !important;
+}
+
+.table th, .table td {
+    border: 1px solid #dddddd !important;
+}
+</style>
+{% endblock %}
+{% block content %}
+    <section id="data-view">
+        <div class="row filters">
+        <span class="span12">
+
+                <form class="form form-horizontal" id="search_form" method="post">
+                    <div class="container_table">
+                        <table class="table table-bordered" id="filter-table" style="margin-left:.3cm;">
+                            <thead>
+                                <tr>
+                                    <th width="40%" style="text-align:center">Search Criteria</th>
+                                    <th width="40%" style="text-align:center">Value</th>
+                                    <th width="20%" style="text-align:center"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="row0">
+                                    <td style="text-align:center">
+                                        <div class="col-sm-5">
+                                            <p>Submission Date</p>
+                                        </div>
+                                    </td>
+                                    <td id="td-B-0" style="text-align:center">
+                                        <!-- <p>From:</p> -->
+                                        <div id="datetimepicker1" class="input-append date">
+                                            <input type="text" placeholder="From" class="datepicker" name="start_date" id="start_date"/>
+                                        </div><br>
+                                        <!-- <p>To:</p> -->
+                                        <div id="datetimepicker2" class="input-append date">
+                                            <input type="text" placeholder="To" class="datepicker" name="end_date" id="end_date"/>
+                                        </div>
+                                    </td>
+                                    <td style="text-align:center">
+                                        <div class="col-xs-2">
+                                            <a class="btn btn-warning btn-circle btn-outline"  onclick="removeRow(row0)"  data-target="#confirm-delete"><i class="glyphicon glyphicon-remove"></i>x</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr id="row1">
+                                    <td style="text-align:center">
+                                        <div class="col-sm-5">
+                                            <p>Submitted By</p>
+                                        </div>
+                                    </td>
+                                    <td id="td-B-1" style="text-align:center">
+                                        <div class="col-sm-5">
+                                           <select id ="userlist" class="userlist">
+                                                <option value="custom">Select a User</option>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td style="text-align:center">
+                                        <div class="col-xs-2">
+                                            <a class="btn btn-warning btn-circle btn-outline"  onclick="removeRow(row1)"  data-target="#confirm-delete"><i class="glyphicon glyphicon-remove"></i>x</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" style="margin-left:12px" id="add-more" class="btn btn-primary">Add More</button>
+                    </div>
+                </form>
+                <!--<div class="data-table-container">
+                    <div class="table-control-container">
+                    </div>
+                </div>
+                
+                <div class="custome-filter"></div>
+				-->
+            <div style="clear: both;"></div>
+        </span>
+        </div>
+
+           <div class="tab_position"> <!--tab-->
+               <ul class="nav nav-tabs">
+                   <li {% if tab_selection == "#grid" %} class="active" {% endif %}><a data-toggle="tab" href="#grid">Grid</a></li>
+                   
+                   
+                   <li {% if tab_selection == "#audio" %} class="active" {% endif %}><a data-toggle="tab" href="#audio">Audio</a></li>
+                   {% comment %}
+                   <li {% if tab_selection == "#chart" %} class="active" {% endif %}><a data-toggle="tab" href="#chart">Chart</a></li>
+                   <li {% if tab_selection == "#gallery" %} class="active" {% endif %}><a data-toggle="tab" href="#gallery">View Gallery</a></li>	
+                   <li {% if tab_selection == "#attachments" %} class="active" {% endif %}><a data-toggle="tab" href="#attachments">Attachments</a></li>
+                   {% endcomment %}
+               </ul>
+
+           <div class="tab-content">
+               <div id="grid" class="tab-pane fade {% if tab_selection == "#grid" %} in active {% endif %}">
+                   <h3>HOME</h3>
+                   <div class="data-table-container">
+                       <div class="table-control-container">
+                       </div>
+                   </div>
+                   <div class="custome-filter"></div>
+               </div>
+               
+               
+               <div id="audio" class="tab-pane fade {% if tab_selection == "#audio" %} in active {% endif %}">
+                   <h3>Audio</h3>
+                   <div class="audio-container">
+                    <div class="table-filter">
+                      <select id ="criteria1" class="audio_filters">
+                           <option value="custom">Select a Question</option>
+                       </select>
+                       <select id ="criteria2" class="audio_filters">
+                           <option value="custom">Select a Question</option>
+                       </select>
+                       <button type="button" style="margin-left:12px" id="preview" class="btn btn-primary">Preview</button>
+                    </div>                   
+
+                    <div class="audio-table">
+                    </div>
+
+                    <div class="audio-filter">
+                    </div>
+                        <div id="audio-list">
+                           <!--
+                           <audio controls>
+                             <source src="https://192.168.21.50:8001/media/kobo/attachments/courage_cowardly_dog.mp3" type="audio/mpeg">
+                           Your browser does not support the audio element.
+                           </audio>
+
+                           <a href="https://192.168.21.50:8001/media/kobo/attachments/courage_cowardly_dog.mp3" download="bobo.mp3" target="_blank">Download</a>
+                           -->
+                        </div>
+
+                   </div>
+               </div>
+               {% comment %}
+               <div id="chart" class="tab-pane fade {% if tab_selection == "#chart" %} in active {% endif %}">
+                   <div class="chart_view_header" >
+                       <div class="chart-filter">
+                           <select id ="chart_filter" class="chart_filter">
+                               <option value="custom">Select an Option</option>
+                           </select>
+                       </div>                    
+                       <div class="chart-header-btn">
+                           <input id="view7days-button" type="submit" class="btn btn-primary" value="{% trans 'Last 7 Days' %}" />
+                           <input id="view30days-button" type="submit" class="btn btn-primary" value="{% trans 'Last 30 Days' %}" />
+                           <input id="view60days-button" type="submit" class="btn btn-primary" value="{% trans 'Last 60 Days' %}" />
+                       </div>
+                       <div class="chart-filter">
+                           <select id ="chart_type" class="chart_type">
+                               <option value="column">Select an Option</option>
+                               <option value="column">Column</option>
+                               <option value="line">Line</option>
+                               <option value="area">Area</option>
+                           </select>
+                       </div> 
+                       
+                   </div>
+                   <div class="chart-main-container" id="chart-main-container"></div>
+               </div>
+               <div id="gallery" class="tab-pane fade {% if tab_selection == "#gallery" %} in active {% endif %}">
+                   <h3>Gallery</h3>
+                   <!--start gallery -->
+                   <div class="image-filter">
+                       
+                   </div>
+
+                   <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls blueimp-gallery-carousel">
+                       <div class="slides" ></div>
+                       <h3 class="title"></h3>
+                       <a class="prev">‹</a>
+                       <a class="next">›</a>
+                       <a class="close">×</a>
+                       <a class="play-pause"></a>
+                       <ol class="indicator"></ol>
+                   </div>
+
+                   <div id="links">
+                   </div>
+                       
+               </div>	
+               
+               <div id="attachments" class="tab-pane fade {% if tab_selection == "#attachments" %} in active {% endif %}">
+                   <h3>Attachments</h3>
+                   <div class="attachments-container">
+                       <!-- 
+                       <a class="dashboard__button dashboard__button-twoline dashboard__button-download-all-photos" href="/{{username}}/exports/{{xform.id_string}}/zip/">
+                       <i class="fa fa-download"></i>
+                       <span>Download all Audio</span>
+                       </a>
+                       -->
+                       <form class="form form-horizontal" id="attachments_form" action="{% url "onadata.apps.viewer.views.create_export" username xform.id_string export_type_zip %}" method="post" enctype="application/x-www-form-urlencoded">
+                            {% csrf_token %}
+                       <!-- 
+                       <select id ="report_format">
+                            <option value="custom">Select a Report Format</option>
+                            <option value="xls">XLS</option>
+                            <option value="csv">CSV</option>
+                       </select>
+                        <br>
+                       --> 
+                       <input id="export-button" type="submit" onclick="filterDownload(event,2);" class="btn btn-primary" value="{% trans 'Download all Attachments' %}" />
+                       <input type="hidden" name="custom" id="custom" value="attachments"/> 
+                       <input type="hidden" name="query" id="query2" value=""/>
+                       </form>
+
+                       <table id="forms-table" class="table table-bordered table-striped">
+                         <thead>
+                           <tr>
+                             <th>#</th>
+                             <th>{% trans "Filename" %}</th>
+                             <th>{% trans "Date Created" %}</th>
+                             <th>{% trans "Delete" %}</th>
+                           </tr>
+                         </thead>
+                         <tbody>
+                           {% for export in exports_zip %}
+                           <tr>
+                             <td>{{ forloop.counter }}</td>
+                             <td>
+                                 {% if not export.is_pending %}
+                                     {% if export.is_successful %}
+                                         <a href="{% url "onadata.apps.viewer.views.export_download" username xform.id_string export.export_type export.filename %}">{{ export.filename }}</a>
+                                     {% else %}
+                                         Failed
+                                     {% endif %}
+                                 {% else %}
+                                   <span class="status">{% trans "Pending ..." %}</span>
+                                   <a href="#" class="refresh-export-progress" data-role="refresh-export-progress" data-export="{{ export.id|stringformat:"d" }}">{% trans "Click to refresh" %}</a>
+                                 {% endif %}
+                             </td>
+                             <td>{{ export.created_on }}</td>
+                             <td>
+                                 <form action="{% url "onadata.apps.viewer.views.delete_export" username xform.id_string export_type %}" method="post" enctype="application/x-www-form-urlencoded">
+                                   {% csrf_token %}
+                                     <div id="delete-{{ export.id|stringformat:"d" }}" class="modal hide fade">
+                                         <div class="modal-header">
+                                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                             <h3>{% trans "Delete Export" %}</h3>
+                                         </div>
+                                         <div class="modal-body">
+                                             <p>{% trans "Are you sure you want to delete this export?" %}</p>
+                                         </div>
+                                         <div class="modal-footer">
+                                             <a href="#" class="btn" data-dismiss="modal">{% trans "Cancel" %}</a>
+                                             <input type="submit" class="btn btn-primary" value="{% trans 'Delete' %}" />
+                                         </div>
+                                     </div>
+                                   <span style="float:middle;">
+                                   <div>
+                                       <input type="hidden" name="export_id" value="{{ export.id|stringformat:"d" }}">
+                                       <a data-toggle="modal" href="#delete-{{ export.id|stringformat:"d" }}" data-backdrop="true" data-keyboard="true">
+                                           <i class="fa fa-trash-o"></i>
+                                       </a>
+                                    </div>
+                                   </span>
+                                    <input type="hidden" name="custom" id="custom" value="attachments"/>   
+                                 </form>
+                             </td>
+                           </tr>
+                           {% endfor %}
+                         </tbody>
+                       </table>
+                   </div>
+               </div>
+               {% endcomment %}
+           </div>
+        </div> <!--/tab-->
+    </section>
+{% endblock %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script type="text/javascript" src="/static/bower_components/underscore/underscore-min.js"></script>
+    <script type="text/javascript" src="/static/bower_components/backbone/backbone-min.js"></script>
+    <script type="text/javascript" src="/static/js/json2.js"></script>
+    <script type="text/javascript" src="/static/bower_components/backgrid/lib/backgrid.min.js"></script>
+    <script type="text/javascript" src="/static/bower_components/lunr.js/lunr.min.js"></script>
+    <script type="text/javascript" src="/static/bower_components/backbone-pageable/lib/backbone-pageable.min.js"></script>
+    <script type="text/javascript" src="/static/bower_components/backgrid-filter/backgrid-filter.min.js"></script>
+    <script type="text/javascript" src="/static/bower_components/backgrid-paginator/backgrid-paginator.min.js"></script>
+    <script type="text/javascript" src="/static/js/xform.js"></script>
+    <script type="text/javascript" src="/static/js/data_view.js"></script>
+    <script type="text/javascript" src="/static/js/instance.js"></script>
+
+
+    <script src="/static/js/moment.js" type="text/javascript"></script>
+    <script src="/static/js/laconic.js" type="text/javascript"></script>
+    <!--<script src="/static/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>-->
+
+    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+    <!--<link   type="text/css"        rel="stylesheet"  href="/static/css/bootstrap.min.css">-->
+    <!--<link   type="text/css"        rel="stylesheet"  href="/static/css/bootstrap-datetimepicker.min.css">-->
+
+    <script type="text/javascript" src="{{STATIC_URL}}js/bootstrap-datepicker.js"></script>
+    <link href="{{STATIC_URL}}css/datepicker.css" rel="stylesheet">
+
+    <script type="text/javascript">
+        var formJSONUrl = "{% url "onadata.apps.logger.views.download_jsonform" owner.username xform.id_string %}";
+        var mongoAPIUrl = "{% url "onadata.apps.main.views.api" owner.username xform.id_string %}";
+        var views, sideBarViews, multiView, slickView;
+        var filtered_data = new Array();
+        var numDefaultColumns = 30;//number of columns to show by default
+        var instance_view_url = "{% url "onadata.apps.viewer.views.instance" owner.username xform.id_string %}";
+        var dataView;
+        //needed to generate html in proper table row-column
+        var i = 3 ;
+        var flag = "{{flag}}" ;
+        flag = (flag.toLowerCase() === "true");
+        
+        //getting data list of users who's submitted data current user can view from view.
+        var user_list = {{ users_submitted_by|safe }} ;
+        var allowed_users = 0 ;
+        var formatted_list = "["
+        for(loop = 0 ; loop < user_list.length; loop++,allowed_users = loop){
+            formatted_list += '"' + user_list[loop] + '",'
+            $(".userlist").append(
+                 $('<option></option>')
+                        .val(user_list[loop])
+                        .html(user_list[loop]));
+        }
+
+        formatted_list = formatted_list.substring(0, (formatted_list.length -1 )) + ']';
+        
+        var initial_query = '{ "_submitted_by": { "$in" : ' + formatted_list + ' }}' ;
+        if (allowed_users == 0 || !flag ){
+            initial_query = '{}'
+        }
+        
+        $(document).ready(function () {
+            dataView = new FH.DataTableView({
+                el: '.data-table-container',
+                formUrl: formJSONUrl,
+                dataUrl: mongoAPIUrl
+            });
+
+            var _elementFound = false;
+            $(document).bind('DOMSubtreeModified',function(e){
+                if ((e.target && e.target.className == 'backgrid-paginator' )
+                    || (e.srcElement && e.srcElement.className == 'backgrid-paginator')) {
+                    if (_elementFound)
+                        return;
+                    $('.data-table-container table thead tr').prepend('<th class="renderable"> </th>');
+                    $('.data-table-container table tbody tr').attr('title', 'Doube click to view submission');
+                    $('.data-table-container table tbody tr').prepend('<td class="renderable view"><i class="fa fa-eye" title="View submission"></i></i></td>');
+                    _elementFound = true;
+                }
+            })
+
+            $( ".data-table-container" ).on( "click", "td.view", function() {
+                $(this).dblclick();
+            });
+
+
+        });
+    </script>
+
+    <script type="text/javascript" src="/static/js/data_view_extra.js"></script>
+    <script type="text/javascript" src="/static/js/audio_filter.js"></script>
+     <script type="text/javascript">
+        $(function () {
+            $('.datepicker').datepicker({
+                format: 'yyyy-mm-dd'
+            });
+        });
+     </script>
+         <!--start: gallery view js-->
+    <script src="{{STATIC_URL}}js/blueimp-gallery.min.js"></script>
+
+    <script>
+        // var global_image_list = [] ;
+        // document.getElementById('links').onclick = function (event) {
+        //     event = event || window.event;
+        //     var target = event.target || event.srcElement,
+        //         link = target.src ? target.parentNode : target,
+        //         options = {index: link, event: event,hidePageScrollbars: false},
+        //         links = this.getElementsByTagName('a');
+        //     blueimp.Gallery(links, options);
+        // };
+        // $('#blueimp-gallery').width("690px");
+        // function generate_gallery(image_list,image_set){
+        //     global_image_list = image_list ;
+        //     $(".image-filter").empty();
+        //     $("#links").empty();
+
+        //     if(image_list.length > 0){
+        //         $(".image-filter").append('<label>Image Selection</label>');
+        //         $(".image-filter").append('<select id="image_filter">');
+        //         $("#image_filter").append('<option value="custom">Select an Image</option>');    
+
+        //         image_set.forEach(function(img_count){    
+        //             $("#image_filter").append('<option value="'+img_count.toString()+'">Image '+img_count.toString()+'</option>');
+        //         });
+
+        //         $(".image-filter").append('</select>');
+        //         $(".image-filter").append('<button type="button" style="margin-left:12px" id="btn-filter" class="btn btn-primary" >Show</button>');
+        //     }else{
+        //         $("#links").append("<h4>No Image Available</h4>");
+        //     }
+
+        //     image_list.forEach(function(image){
+        //         var img = '<a href="'+image.media_path+'" title="'+image.media_name+'" class="'+ image.media_count +'" data-gallery>';
+        //         img += '<img src="'+image.media_path+'" width="100px" height="100px" class="'+ image.media_count +'" alt="'+image.media_name+'">';
+        //         img += '</a>';
+        //         $("#links").append(img);
+        //     });
+        // }
+
+        // $(document).on('click', '#btn-filter', function() {
+        //     var filter_value = $("#image_filter").val();
+        //     if(filter_value !== 'custom'){
+        //         $("#links").empty();
+        //         console.log(global_image_list);
+        //         global_image_list.forEach(function(image){
+        //             if ( filter_value === String(image.media_count)){
+        //                 var img = '<a href="'+image.media_path+'" title="'+image.media_name+'" class="'+ image.media_count +'" data-gallery>';
+        //                 img += '<img src="'+image.media_path+'" width="100px" height="100px" class="'+ image.media_count +'" alt="'+image.media_name+'">';
+        //                 img += '</a>';
+        //                 $("#links").append(img);
+        //             }
+        //         });       
+        //     }
+        // });
+
+        function generate_audio(audio_list,audio_set){
+            global_audio_list = audio_list ;
+            $(".audio-filter").empty();
+            $("#audio-list").empty();
+
+            if(audio_list.length > 0){
+                $(".audio-filter").append('<h5>Please use latest version of google chrome browser for best results</h5>');
+                $(".audio-filter").append('<label>Audio Selection</label>');
+                $(".audio-filter").append('<select id="audio_filter">');
+                $("#audio_filter").append('<option value="custom">Select a Audio</option>');    
+
+                audio_set.forEach(function(audio_count){    
+                    $("#audio_filter").append('<option value="'+audio_count.toString()+'">'+audio_count.toString()+'</option>');
+                });
+
+                $(".audio-filter").append('</select>');
+                $(".audio-filter").append('<button type="button" style="margin-left:12px" id="btn-audio-filter" class="btn btn-primary" >Show</button>');
+            }else{
+                $(".audio-filter").append("<h4>No Audio Available</h4>");
+            }
+
+            //===
+            $(document).on('click', '#btn-audio-filter', function() {
+                var filter_value = $("#audio_filter").val();
+                if(filter_value !== 'custom'){
+                    $("#audio-list").empty();
+                    // console.log(global_audio_list);
+                    $("#audio-list").append('<div class="table-control-container">');
+		            var table = '<table class="table" id="audio_table">';
+		            table += '<tr>';
+		            table += '<th>Filename</th>';
+		            table += '<th>Audio</th>';
+		            table += '<th>Download</th>';
+		            table += '</tr>';
+                    global_audio_list.forEach(function(audio){
+                        if ( filter_value === String(audio.media_label)){
+                            // var img = '<a href="'+image.media_path+'" title="'+image.media_name+'" class="'+ image.media_count +'" data-gallery>';
+                            // img += '<img src="'+image.media_path+'" width="100px" height="100px" class="'+ image.media_count +'" alt="'+image.media_name+'">';
+                            // img += '</a>';
+                            // $("#links").append(img);
+                            table += '<tr>' ;
+			                table += '<td>'+audio.media_name+'</td>' ;
+			                // table += '<td><audio controls><source src="'+audio.media_path+'" type="'+audio.mimetype+'">Your browser does not support the audio element.</audio></td>' ;
+			                table += '<td><audio controls><source src="'+audio.media_path+'" type="audio/mpeg">Your browser does not support the audio element.</audio></td>' ;
+			                table += '<td><a href="'+audio.media_path+'" download="'+audio.media_name+'" target="_blank">'+audio.media_name+'</a></td>' ;
+			                table += '</tr>' ;
+                        }
+                    });
+                    table += '</table>' ;
+                    $("#audio-list").append(table);
+            		$("#audio-list").append('</div>');               
+                }
+            });
+            //===
+
+            //== working code:start
+            // $("#audio-list").append('<div class="table-control-container">');
+            // var table = '<table class="table" id="audio_table">';
+            // table += '<tr>';
+            // table += '<th>Filename</th>';
+            // table += '<th>Audio Link</th>';
+            // table += '<th>Download</th>';
+            // table += '</tr>';
+            
+
+            // audio_list.forEach(function(audio){
+            //     table += '<tr>' ;
+            //     table += '<td>'+audio.media_name+'</td>' ;
+            //     table += '<td><audio controls><source src="'+audio.media_path+'" type="audio/mpeg">Your browser does not support the audio element.</audio></td>' ;
+            //     table += '<td><a href="'+audio.media_path+'" download="'+audio.media_name+'" target="_blank">'+audio.media_name+'</a></td>' ;
+            //     table += '</tr>' ;
+            // });
+            // table += '</table>' ;
+                    
+            // $("#audio-list").append(table);
+            // $("#audio-list").append('</div>');        
+            //== working code:end
+
+            
+        }        
+        
+    </script>
+    <!--end: gallery view js-->
+
+{% endblock %}

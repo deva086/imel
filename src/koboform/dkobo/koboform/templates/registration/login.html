@@ -1,0 +1,24 @@
+{% extends "registration.html" %}
+
+{% block inner_content %}
+  <form method="post" action="." class="registration registration--login">
+    {% include 'registration/logo.html' %}
+    {% csrf_token %}
+    {{ form.as_p }}
+    <a href="{% url 'auth_password_reset' %}" class="registration__forgot">Forgot?</a>
+
+    <input type="submit" value="Login" class="registration__action" />
+    <input type="hidden" name="next" value="{{ next }}" />
+
+    <div class="registration__footer">
+      or <a href="{% url 'registration_register' %}">create an account</a>
+    </div>
+  </form>
+  <script>
+    $(function () {
+      $('form.registration input#id_username').attr('placeholder', 'Username');
+      $('form.registration input#id_password').attr('placeholder', 'Password');
+      $('form.registration > p > label').addClass('hidden');
+    });
+  </script>
+{% endblock %}

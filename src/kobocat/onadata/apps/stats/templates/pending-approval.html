@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+  <div class="page-header">
+<br>
+<h1> {% blocktrans with nb_sub=stats.submission_count.total_submission_count %}Approval Pending Submissions ({{ nb_sub }}){% endblocktrans %}</h1>
+  </div>
+
+  <table id="stats-table" class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>{% trans "FormID" %}</th>
+        <th>{% trans "SubmissionId" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+		
+     {% for v in approvals %}
+      <tr>
+        <td>{{v.formid}}</td>
+        <td>{{v.subbmissionid}}</td>
+      </tr>
+
+ {% endfor %}
+    </tbody>
+  </table>
+
+  <hr />
+{% endblock %}
+{% block javascript %}
+{{ block.super }}
+  <script type="text/javascript" src="{{STATIC_URL}}js/jquery.dataTables.js"></script>
+  <script type="text/javascript" src="{{STATIC_URL}}js/jquery.dataTables.pagination.js"></script>
+  <script type="text/javascript">
+
+	$(document).ready(function() {
+        $.extend( $.fn.dataTableExt.oStdClasses, {
+          "sSortAsc": "header headerSortDown",
+          "sSortDesc": "header headerSortUp",
+          "sSortable": "header"
+        } );
+
+	  $('#stats-table').dataTable({
+                  "sDom": "<'row'<'span8'l><'span8'f>r>t<'row'<'span8'i><'span8'p>>",
+	          "bPaginate" : true,
+                  "sPaginationType": "bootstrap",
+                  "iDisplayLength": 25,
+                  "bSort": true,
+                  "oLanguage": {"sSearch": "{% trans 'Search:' %}"},
+                  "aoColumns": [null, {"sType": "numeric", "sClass": "right", "sWidth":"100px"}],
+                  "oSearch": {"sSearch": ""},
+	          "aaSorting": [[ 1, "desc" ]]
+          });
+	 
+	});
+
+ $('#stats-table tr').click( function () {
+		var form_id = $('td', this).eq(0).text();
+		var submission_id = $('td', this).eq(1).text();
+		if (submission_id) {
+		var location = window.location.href;
+		var host = window.location.host;
+		var pathname = window.location.pathname;
+		console.log("form_id::"+form_id);
+		console.log("submission::"+submission_id);
+		console.log("pathname::"+pathname);
+		var url = '/data/approval-list/'
+        post_data = {'submissionid': submission_id,'formid':form_id};
+	    $.ajax({
+           url: url,
+           type: "POST",
+           data: post_data,
+           success: function(data){
+
+		var form_owner = data["form_owner"];
+                 location = location.replace('stats/pending-approval/','');
+                window.open(window.location.protocol+"//"+host+'/'+ form_owner+'/forms/'+form_id +'/instance/?s_id='+submission_id+ "#/" + submission_id, "_blank");
+           }
+      });
+
+    }
+
+	  });
+
+  </script>
+{% endblock %}

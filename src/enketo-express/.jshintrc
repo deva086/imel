@@ -1,0 +1,15 @@
+{
+    "strict" : true,
+    "globals": {
+        "module": false,
+        "require": false, 
+        "Promise": true,
+        "indexedDB": true,
+        "define": true
+    },
+    "node": true,
+    "browser": true,
+    "jquery": false,
+    "sub": true,
+    "esnext": true
+}

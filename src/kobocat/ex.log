@@ -1,0 +1,188 @@
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+WARNING:py.warnings:/home/mpoweradmin/.virtualenvs/kc/local/lib/python2.7/site-packages/requests/packages/urllib3/connectionpool.py:730: InsecureRequestWarning: Unverified HTTPS request is being made. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.org/en/latest/security.html (This warning will only appear once by default.)
+  InsecureRequestWarning)
+
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 502 181
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 502 181
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 502 181
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 502 181
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 502 181
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+WARNING:py.warnings:/home/mpoweradmin/.virtualenvs/kc/local/lib/python2.7/site-packages/requests/packages/urllib3/connectionpool.py:730: InsecureRequestWarning: Unverified HTTPS request is being made. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.org/en/latest/security.html (This warning will only appear once by default.)
+  InsecureRequestWarning)
+
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 502 181
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+WARNING:py.warnings:/home/mpoweradmin/.virtualenvs/kc/local/lib/python2.7/site-packages/requests/packages/urllib3/connectionpool.py:730: InsecureRequestWarning: Unverified HTTPS request is being made. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.org/en/latest/security.html (This warning will only appear once by default.)
+  InsecureRequestWarning)
+
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 502 181
+DEBUG:root:test log-1
+DEBUG:root:test log-1
+DEBUG:root:test log-1
+DEBUG:root:test log-2
+DEBUG:root:test log-12
+DEBUG:root:test log-0
+DEBUG:root:test log-1
+DEBUG:root:test log-11
+DEBUG:root:test log-0
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 201 75
+DEBUG:root:test log-1
+DEBUG:root:test log-1
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 201 75
+DEBUG:root:test log-1
+DEBUG:root:test log-1
+DEBUG:root:test log-2
+DEBUG:root:test log-12
+DEBUG:root:test log-0
+DEBUG:root:test log-1
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 200 75
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 201 75
+DEBUG:root:test log-1
+DEBUG:audit_logger:Requested data view for 'daily_accomplishment'.
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 200 75
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 200 75
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 200 75
+INFO:root:(apps/main/views.py) permtype: report
+DEBUG:audit_logger:Report permissions on 'daily_accomplishment' assigned to 'anupoma'.
+INFO:root:(apps/main/views.py) permtype: report
+DEBUG:audit_logger:Report permissions on 'daily_accomplishment' assigned to 'dabirul'.
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 200 75
+DEBUG:root:test log-1
+DEBUG:root:test log-0
+DEBUG:audit_logger:Requested forms list.
+WARNING:py.warnings:./onadata/apps/logger/views.py:214: DeprecationWarning: The mimetype keyword argument is deprecated, use content_type instead
+  }, mimetype="text/xml; charset=utf-8")
+
+INFO:root:(apps/main/views.py) permtype: view
+INFO:root:(apps/main/views.py) Setting perms...
+DEBUG:audit_logger:View permissions on 'daily_accomplishment' assigned to 'dabirul'.
+INFO:root:(apps/main/views.py) setting perms, where id = daily_accomplishment
+WARNING:django.request:Not Found: /oxfam/delete/edmis_form/js/jquery.min.js
+WARNING:django.request:Not Found: /oxfam/delete/tipping/bootstrap/css/bootstrap-responsive.min.css
+WARNING:django.request:Not Found: /oxfam/delete/tipping/js/vex.combined.min.js
+INFO:root:(apps/main/views.py) permtype: view
+INFO:root:(apps/main/views.py) Setting perms...
+DEBUG:audit_logger:View permissions on 'daily_accomplishment' assigned to 'sabur'.
+INFO:root:(apps/main/views.py) setting perms, where id = daily_accomplishment
+INFO:root:(apps/main/views.py) permtype: report
+INFO:root:(apps/main/views.py) _User_already has permission
+DEBUG:audit_logger:Report permissions on 'daily_accomplishment' assigned to 'sabur'.
+ERROR:django.request:Internal Server Error: /merge/get_merge_json/
+Traceback (most recent call last):
+  File "/home/mpoweradmin/.virtualenvs/kc/local/lib/python2.7/site-packages/django/core/handlers/base.py", line 112, in get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "./onadata/apps/merge_report_gen/views.py", line 128, in get_merge_data_with_filter
+    cursor.execute(accomplishment_form_query)
+  File "/home/mpoweradmin/.virtualenvs/kc/local/lib/python2.7/site-packages/django/db/backends/util.py", line 53, in execute
+    return self.cursor.execute(sql, params)
+  File "/home/mpoweradmin/.virtualenvs/kc/local/lib/python2.7/site-packages/django/db/utils.py", line 99, in __exit__
+    six.reraise(dj_exc_type, dj_exc_value, traceback)
+  File "/home/mpoweradmin/.virtualenvs/kc/local/lib/python2.7/site-packages/django/db/backends/util.py", line 51, in execute
+    return self.cursor.execute(sql)
+ProgrammingError: function crosstab(unknown) does not exist
+LINE 1: ...le_boys::int) as disable_boys from (select * from crosstab('...
+                                                             ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+DEBUG:audit_logger:Requested forms list.
+WARNING:py.warnings:./onadata/apps/logger/views.py:214: DeprecationWarning: The mimetype keyword argument is deprecated, use content_type instead
+  }, mimetype="text/xml; charset=utf-8")
+
+INFO:root:(apps/main/views.py) permtype: view
+INFO:root:(apps/main/views.py) Setting perms...
+DEBUG:audit_logger:View permissions on 'monthly_target_form' assigned to 'anupoma'.
+INFO:root:(apps/main/views.py) setting perms, where id = monthly_target_form
+INFO:root:(apps/main/views.py) permtype: view
+INFO:root:(apps/main/views.py) _User_already has permission
+DEBUG:audit_logger:Requested instance view for 'daily_accomplishment'.
+INFO:root:(apps/main/views.py) permtype: view
+INFO:root:(apps/main/views.py) Setting perms...
+DEBUG:audit_logger:View permissions on 'daily_accomplishment' assigned to 'pc_pls'.
+INFO:root:(apps/main/views.py) setting perms, where id = daily_accomplishment
+INFO:root:(apps/main/views.py) permtype: edit
+INFO:root:(apps/main/views.py) _User_already has permission
+DEBUG:audit_logger:Edit permissions on 'daily_accomplishment' assigned to 'pc_pls'.
+WARNING:django.request:Not Found: /oxfam/delete/edmis_form/css/font-awesome.min.css
+WARNING:django.request:Not Found: /oxfam/delete/edmis_form/css/ona-screen-overrides.css
+WARNING:django.request:Not Found: /oxfam/delete/edmis_form/css/published_forms.css
+WARNING:django.request:Not Found: /oxfam/delete/edmis_form/css/footable.css
+WARNING:django.request:Not Found: /oxfam/delete/edmis_form/js/jquery.tablesorter.min.js
+WARNING:django.request:Not Found: /oxfam/delete/edmis_form/bootstrap/js/bootstrapx-clickover-btns.js
+WARNING:django.request:Not Found: /oxfam/delete/edmis_form/js/footable.min.js
+WARNING:django.request:Not Found: /oxfam/delete/edmis_form/js/kobo-branding.js
+ERROR:django.request:Internal Server Error: /oxfam/delete/edmis_form/
+Traceback (most recent call last):
+  File "/home/mpoweradmin/.virtualenvs/kc/local/lib/python2.7/site-packages/django/core/handlers/base.py", line 112, in get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "./onadata/libs/utils/decorators.py", line 28, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+  File "/home/mpoweradmin/.virtualenvs/kc/local/lib/python2.7/site-packages/django/views/decorators/http.py", line 41, in inner
+    return func(request, *args, **kwargs)
+  File "./onadata/apps/logger/views.py", line 521, in delete_xform
+    remove_xform(xform)
+  File "./onadata/libs/utils/logger_tools.py", line 679, in remove_xform
+    remove_approval(xform)
+  File "./onadata/libs/utils/logger_tools.py", line 689, in remove_approval
+    approval_def = ApprovalDef.objects.filter(formid=xform.id_string)
+NameError: global name 'ApprovalDef' is not defined
+WARNING:django.request:Not Found: /oxfam/delete/edmis_form/css/ona-screen-overrides.css
+WARNING:django.request:Not Found: /oxfam/delete/edmis_form/css/published_forms.css
+WARNING:django.request:Not Found: /oxfam/delete/edmis_form/css/vex-theme-kobo.css
+WARNING:django.request:Not Found: /oxfam/delete/edmis_form/bootstrap/js/bootstrapx-clickover-btns.js
+INFO:root:(apps/main/views.py) permtype: view
+INFO:root:(apps/main/views.py) Setting perms...
+DEBUG:audit_logger:View permissions on 'monthly_target_form' assigned to 'mostofa'.
+INFO:root:(apps/main/views.py) setting perms, where id = monthly_target_form
+DEBUG:root:test log-1
+DEBUG:root:test log-0
+INFO:root:(apps/main/views.py) permtype: report
+INFO:root:(apps/main/views.py) _User_already has permission
+DEBUG:audit_logger:Report permissions on 'monthly_target_form' assigned to 'sajedul'.
+INFO:root:(apps/main/views.py) permtype: report
+INFO:root:(apps/main/views.py) _User_already has permission
+DEBUG:audit_logger:Report permissions on 'monthly_target_form' assigned to 'protic'.
+DEBUG:root:test log-1
+DEBUG:root:test log-0
+INFO:root:(apps/main/views.py) permtype: view
+INFO:root:(apps/main/views.py) Setting perms...
+DEBUG:audit_logger:View permissions on 'daily_accomplishment' assigned to 'porna'.
+INFO:root:(apps/main/views.py) setting perms, where id = daily_accomplishment
+INFO:root:(apps/main/views.py) permtype: report
+INFO:root:(apps/main/views.py) _User_already has permission
+DEBUG:audit_logger:Report permissions on 'monthly_accomplishment_summary_report' assigned to 'porna'.
+WARNING:django.request:Not Found: /safiur/forms/daily_accomplishment/css/font-awesome.min.css
+WARNING:django.request:Not Found: /safiur/forms/daily_accomplishment/bootstrap/css/bootstrap-responsive.min.css
+WARNING:django.request:Not Found: /safiur/forms/daily_accomplishment/css/vex-theme-kobo.css
+WARNING:django.request:Not Found: /safiur/forms/daily_accomplishment/bootstrap/js/bootstrapx-clickover-btns.js
+WARNING:django.request:Not Found: /safiur/forms/daily_accomplishment/js/kobo-branding.js
+INFO:requests.packages.urllib3.connectionpool:Starting new HTTPS connection (1): imel.oxfam.org.uk
+WARNING:py.warnings:/home/mpoweradmin/.virtualenvs/kc/local/lib/python2.7/site-packages/requests/packages/urllib3/connectionpool.py:730: InsecureRequestWarning: Unverified HTTPS request is being made. Adding certificate verification is strongly advised. See: https://urllib3.readthedocs.org/en/latest/security.html (This warning will only appear once by default.)
+  InsecureRequestWarning)
+
+DEBUG:requests.packages.urllib3.connectionpool:"POST /api/v2/survey/offline HTTP/1.1" 200 75
+DEBUG:root:test log-1
+DEBUG:root:test log-1
+DEBUG:root:test log-1
+DEBUG:root:test log-1
+DEBUG:root:test log-2
+DEBUG:root:test log-12
+DEBUG:root:test log-0
+DEBUG:audit_logger:Downloaded XML for form 'monthly_target_form'.
+DEBUG:audit_logger:Downloaded XML for form 'daily_accomplishment'.
+DEBUG:root:test log-1
+DEBUG:root:test log-2
+DEBUG:root:test log-12
+DEBUG:root:test log-0
